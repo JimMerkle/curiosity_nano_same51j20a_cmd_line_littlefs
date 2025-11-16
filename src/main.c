@@ -27,6 +27,7 @@
 #include <stdlib.h>                     // Defines EXIT_FAILURE
 #include "definitions.h"                // SYS function prototypes
 #include "command_line/command_line.h"
+#include "littlefs/lfs_interface.h"
 
 
 // *****************************************************************************
@@ -37,38 +38,40 @@
 
 int main ( void )
 {
-    /* Initialize all modules */
-    SYS_Initialize ( NULL );
-    SYSTICK_TimerStart();
-    //-------------------------------------------------------
-    // Before we start TC0, reconfigure the period
-    /* Configure timer period */
-    TC0_REGS->COUNT32.TC_CC[0U] = 0xFFFFFFFFU;
-    /* Clear all interrupt flags */
-    TC0_REGS->COUNT32.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
-    while((TC0_REGS->COUNT32.TC_SYNCBUSY) != 0U)
-    { /* Wait for Write Synchronization */ }
-    TC0_TimerStart(); // microsecond counter
-    //-------------------------------------------------------
-    
-    cl_setup();
-    
-    SYSTICK_DelayMs(100);
-    lfs_init(); // Mount LittleFS
-    
-    while ( true )
-    {
-        /* Maintain state machines of all polled MPLAB Harmony modules. */
-        //SYS_Tasks ( ); // Nothing here at this time
-        cl_loop();
-        LED_PA14_AL_Toggle();
-        SYSTICK_DelayMs(50);
-        
-    }
+   /* Initialize all modules */
+   SYS_Initialize ( NULL );
+   SYSTICK_TimerStart();
+   //-------------------------------------------------------
+   // Before we start TC0, reconfigure the period
+   /* Configure timer period */
+   TC0_REGS->COUNT32.TC_CC[0U] = 0xFFFFFFFFU;
+   /* Clear all interrupt flags */
+   TC0_REGS->COUNT32.TC_INTFLAG = (uint8_t)TC_INTFLAG_Msk;
+   while((TC0_REGS->COUNT32.TC_SYNCBUSY) != 0U)
+   { /* Wait for Write Synchronization */ }
+   TC0_TimerStart(); // microsecond counter
+   //-------------------------------------------------------
 
-    /* Execution should not come here during normal operation */
+   cl_setup();
 
-    return ( EXIT_FAILURE );
+   SYSTICK_DelayMs(100);
+    
+   // Mount LittleFS 
+   lfs_init(&lfs, &lfs_cfg);
+
+   while ( true )
+   {
+       /* Maintain state machines of all polled MPLAB Harmony modules. */
+       //SYS_Tasks ( ); // Nothing here at this time
+       cl_loop();
+       LED_PA14_AL_Toggle();
+       SYSTICK_DelayMs(50);
+
+   }
+
+   /* Execution should not come here during normal operation */
+
+   return ( EXIT_FAILURE );
 }
 
 

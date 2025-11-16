@@ -9,9 +9,7 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>../src/command_line</sourceRootElem>
-                <sourceRootElem>../src/logger</sourceRootElem>
-                <sourceRootElem>../src/littlefs</sourceRootElem>
+                <sourceRootElem>../src</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

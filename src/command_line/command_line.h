@@ -69,4 +69,9 @@ int cl_info(void);
 int cl_version(void);
 int cl_logger_test(void);       // logger.c
 
+int cl_xmodem_receive(void);
+int cl_xmodem_send(void);
+
+int cl_ini_store_test(void); // ini_store_test.c
+
 #endif // _command_line_h_

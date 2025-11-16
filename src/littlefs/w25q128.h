@@ -35,6 +35,7 @@
 #define W25_JEDEC_ID_BUF_SIZE   3   // bytes
 #define W25_UNIQUE_ID_BUF_SIZE  8   // bytes
 #define W25_PROGRAM_BLOCK_SIZE  256  // bytes - can write from 1 up to 256 bytes
+#define W25_PROGRAM_PAGE_SIZE   256
 #define W25_SECTOR_SIZE         4096 // bytes - used for erasing portions device
 #define W25_DEVICE_SIZE         (16*1024*1024) // bytes (128MBit = 16MBytes)
 #define W25_SECTOR_COUNT        (W25_DEVICE_SIZE/W25_SECTOR_SIZE)

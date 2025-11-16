@@ -11,7 +11,8 @@
 #ifndef _lfs_interface_h_
 #define _lfs_interface_h_
 
-#include "w25q128.h"
+#include "littlefs/w25q128.h"
+#include "littlefs/lfs.h"
 
 /**********************************************************************************************************************
  * Macro definitions
@@ -19,7 +20,11 @@
 /** This macro is used to suppress compiler messages about a parameter not being used in a function. */
 #define PARAMETER_NOT_USED(p) (void) ((p))
 
-int lfs_init(void); // Initialization for LittleFS
+extern lfs_t lfs;
+extern const struct lfs_config lfs_cfg;
+
+int lfs_init(lfs_t *lfs, const struct lfs_config *cfg); // Initialization for LittleFS
+int lfs_gets(lfs_file_t *file, char *buffer, size_t buffsize);
 
 // Command Line functions implemented within littlefs_interface.c:
 int cl_lfs(void);

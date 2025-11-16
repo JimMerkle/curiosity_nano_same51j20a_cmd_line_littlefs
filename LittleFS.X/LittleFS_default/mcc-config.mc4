@@ -59,7 +59,7 @@ generatedFileHashHistoryMap:
 - file: ..\src\config\default\peripheral\port\plib_port.h
   hash: 3f74ccffeb3b24e2565e2e1bba02db4a96daf8360bfd3ca33923e3144b2b91f0
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom1_spi_master.c
-  hash: b9c7e114b7b5f4040cbe1c1329c4a945d0fb501ee9c8639e06ae999a00f6c1f0
+  hash: 09ba80abfbc65d633d4c93e2633a0aec1a2dfbb6f53dc550ce4c06bb139e0977
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom1_spi_master.h
   hash: 94858ce75946aab8706a2b90a08d79a392fffb1a766510e906874e644e221886
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom_spi_master_common.h

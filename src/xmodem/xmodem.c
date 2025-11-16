@@ -38,9 +38,11 @@
 #include <stdio.h>
 #include <string.h> // memcpy(), memset()
 #include "crc16.h"
-#include "main.h"   // STM32 HAL APIs
-#include "command_line.h" // argc, argv
-#include "lfs.h"	// LittleFS APIs
+#include "definitions.h"                // SYS function prototypes
+#include "command_line/command_line.h" // argc, argv
+#include "littlefs/lfs.h"	// LittleFS APIs
+#include "littlefs/lfs_interface.h"
+#include "logger/logger.h"
 
 #define SOH  0x01
 #define STX  0x02
@@ -61,7 +63,7 @@ static lfs_file_t * file; // our lfs file structure
 //=================================================================================================
 // Interface functions to merge this X-Modem code with the current STM32 platform code available
 //=================================================================================================
-extern int __io_getchar(void); // main.c
+extern int __io_getchar(void); // command_line.c
 extern int __io_putchar(int ch); // main.c
 extern lfs_t lfs; // littlefs_interface.c
 #define _outbyte(c) __io_putchar(c)
@@ -70,14 +72,20 @@ extern lfs_t lfs; // littlefs_interface.c
 int _inbyte(uint32_t timeout_ms)
 {
 	// Get millisecond tick count when entering this function
-    uint32_t entry_ticks = HAL_GetTick();
+    uint32_t entry_ticks = SYSTICK_GetTickCounter();
     int ser_data;
     // Loop until we receive a character or timeout occures
     do {
         ser_data =  __io_getchar();
         if(ser_data >=0) return ser_data; // character received (not EOF)
-	} while ((HAL_GetTick() - entry_ticks) < timeout_ms);
+	} while ((SYSTICK_GetTickCounter() - entry_ticks) < timeout_ms);
     return ser_data; // return EOF received from previous __io_getchar() call
+}
+
+int __io_putchar(int ch) {
+   uint8_t data_byte = (uint8_t)ch;
+   SERCOM5_USART_Write(&data_byte, sizeof(data_byte));
+   return ch;
 }
 
 //=================================================================================================
@@ -335,7 +343,7 @@ int cl_xmodem_receive(void)
 
 	// Check number of command line arguments.  Should have at least two: command, <filename>
 	if(argc <2 ) {
-		printf("Not enough arguments.  Need <filename>\n");
+		log_msg("Not enough arguments.  Need <filename>\n");
 		return -1;
 	}
 	filename = argv[1]; // use a name instead of some indexed string
@@ -343,16 +351,16 @@ int cl_xmodem_receive(void)
 	// Create file for writing (file must not already exist) - return negative error code on failure.
 	lfs_status = lfs_file_open(&lfs, file, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_EXCL);
     if(lfs_status != LFS_ERR_OK) {
-        printf("%s: Error creating XModem receive file \"%s\"\n",__func__,filename);
+        log_msg("%s: Error creating XModem receive file \"%s\"\n",__func__,filename);
         return lfs_status;
     }
 
-    //printf("%s: File \"%s\" open for data\n",__func__,filename);
+    //log_msg("%s: File \"%s\" open for data\n",__func__,filename);
     xmodem_status = xmodemReceive(); // use static file structure, 'file'
-	if(xmodem_status) printf("xmodemReceive() status: %d\n",xmodem_status);
+	if(xmodem_status) log_msg("xmodemReceive() status: %d\n",xmodem_status);
 	status = lfs_file_close(&lfs, file); // close open file "handle", performing final flush to FLASH
-	if(status) printf("lfs_file_close() status: %d\n",status);
-	if (xmodem_status == LFS_ERR_OK) printf ("Xmodem successfully received %d bytes\n", status);
+	if(status) log_msg("lfs_file_close() status: %d\n",status);
+	if (xmodem_status == LFS_ERR_OK) log_msg ("Xmodem successfully received %d bytes\n", status);
 	return xmodem_status;
 }
 
@@ -368,7 +376,7 @@ int cl_xmodem_send(void)
 
 	// Check number of command line arguments.  Should have at least two: command, <filename>
 	if(argc <2 ) {
-		printf("Not enough arguments.  Need <filename>\n");
+		log_msg("Not enough arguments.  Need <filename>\n");
 		return -1;
 	}
 	filename = argv[1]; // use a name instead of some indexed string
@@ -376,17 +384,17 @@ int cl_xmodem_send(void)
 	// Create file for reading (file must already exist) - return negative error code on failure.
 	lfs_status = lfs_file_open(&lfs, file, filename, LFS_O_RDONLY);
     if(lfs_status != LFS_ERR_OK) {
-        printf("%s: Error creating XModem transmit file \"%s\"\n",__func__,filename);
+        log_msg("%s: Error creating XModem transmit file \"%s\"\n",__func__,filename);
         return lfs_status;
     }
 	status = xmodemTransmit(); // Send the file, returning number of bytes sent
 	lfs_file_close(&lfs, file); // close open file "handle"
 
 	if (status < 0) {
-		printf ("Xmodem transmit error: status: %d\n", status);
+		log_msg ("Xmodem transmit error: status: %d\n", status);
 	}
 	else  {
-		printf ("Xmodem successfully transmitted %d bytes\n", status);
+		log_msg ("Xmodem successfully transmitted %d bytes\n", status);
 	}
 	return status;
 }

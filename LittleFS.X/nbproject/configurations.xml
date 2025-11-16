@@ -54,6 +54,9 @@
           <itemPath>../src/config/default/device_vectors.h</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <logicalFolder name="f5" displayName="ini_store" projectFiles="true">
+        <itemPath>../src/ini_store/ini_store.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f3" displayName="littlefs" projectFiles="true">
         <itemPath>../src/littlefs/lfs.h</itemPath>
         <itemPath>../src/littlefs/lfs_interface.h</itemPath>
@@ -192,6 +195,10 @@
           </logicalFolder>
         </logicalFolder>
       </logicalFolder>
+      <logicalFolder name="f4" displayName="xmodem" projectFiles="true">
+        <itemPath>../src/xmodem/crc16.h</itemPath>
+      </logicalFolder>
+      <itemPath>../src/version.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -279,6 +286,10 @@
           <itemPath>../src/config/default/libc_syscalls.c</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <logicalFolder name="f5" displayName="ini_store" projectFiles="true">
+        <itemPath>../src/ini_store/ini_store.c</itemPath>
+        <itemPath>../src/ini_store/ini_store_test.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="f3" displayName="littlefs" projectFiles="true">
         <itemPath>../src/littlefs/hexdump.c</itemPath>
         <itemPath>../src/littlefs/lfs.c</itemPath>
@@ -289,13 +300,15 @@
       <logicalFolder name="f2" displayName="logger" projectFiles="true">
         <itemPath>../src/logger/logger.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="f4" displayName="xmodem" projectFiles="true">
+        <itemPath>../src/xmodem/crc16.c</itemPath>
+        <itemPath>../src/xmodem/xmodem.c</itemPath>
+      </logicalFolder>
       <itemPath>../src/main.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../src/command_line</Elem>
-    <Elem>../src/logger</Elem>
-    <Elem>../src/littlefs</Elem>
+    <Elem>../src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -344,6 +357,7 @@
       <C32>
         <property key="additional-warnings" value="false"/>
         <property key="addresss-attribute-use" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="cast-align" value="false"/>
         <property key="code-model" value="default"/>
         <property key="const-model" value="default"/>
@@ -373,7 +387,7 @@
         <property key="oXC16gcc-sfr-warn" value="false"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
-        <property key="optimization-level" value="-O0"/>
+        <property key="optimization-level" value="-O2"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -422,6 +436,7 @@
         <property key="additional-options-use-response-files" value="false"/>
         <property key="additional-options-write-sla" value="false"/>
         <property key="allocate-dinit" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="code-dinit" value="false"/>
         <property key="ebase-addr" value=""/>
         <property key="enable-check-sections" value="false"/>
@@ -440,7 +455,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value="512"/>
+        <property key="heap-size" value="4096"/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>
@@ -467,6 +482,7 @@
       <C32CPP>
         <property key="additional-warnings" value="false"/>
         <property key="addresss-attribute-use" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="check-new" value="false"/>
         <property key="eh-specs" value="true"/>
         <property key="enable-app-io" value="false"/>
@@ -495,6 +511,7 @@
         <property key="use-indirect-calls" value="false"/>
       </C32CPP>
       <C32Global>
+        <property key="appendMe" value=""/>
         <property key="combine-sourcefiles" value="false"/>
         <property key="common-include-directories" value=""/>
         <property key="common-macros" value=""/>
@@ -605,6 +622,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-fffff"/>
         <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/jim/Documents/MPLABX_Projects/curiosity_nano_same51j20a_cmd_line_littlefs/LittleFS.X/debug/default/LittleFS_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"

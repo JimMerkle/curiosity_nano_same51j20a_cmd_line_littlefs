@@ -1,0 +1,6 @@
+#.gitignore
+#Project build directories
+LittleFS.X/build/
+LittleFS.X/dist/
+LittleFS.X/mcc-manifest-autosave.yml
+LittleFS.X/mcc-manifest-generated-success.yml

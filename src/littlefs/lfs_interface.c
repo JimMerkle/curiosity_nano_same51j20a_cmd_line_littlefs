@@ -11,6 +11,8 @@
 #include "logger/logger.h"
 #include "definitions.h"                // SYS function prototypes
 
+#if 0
+// Older original code using the W25Q128 functions
 // Read a region in a block. Negative error codes are propagated
 // to the user.
 int lfs_read(const struct lfs_config *c, lfs_block_t block,
@@ -54,6 +56,141 @@ int lfs_erase(const struct lfs_config *c, lfs_block_t block)
   }
   return LFS_ERR_OK;
 }
+#endif
+
+// "New Read" function
+// Read a region of SPI FLASH memory into buffer.
+// Negative error codes are propagated to the user.
+int lfs_read(const struct lfs_config *c, lfs_block_t block,
+             lfs_off_t off, void *buffer, lfs_size_t size)
+{
+   uint32_t address = block * c->block_size + off; 
+   
+   // 1. Activate chip select
+   W25_CS_ENABLE();
+   
+   // 2. Create and issue read command
+   uint8_t cmd[4] = {W25_CMD_READ_DATA,address>>16,address>>8,address};
+   SERCOM1_SPI_Write(cmd , sizeof(cmd));
+   
+   // 3. Read in the payload
+   SERCOM1_SPI_Read(buffer, size);
+   
+   // 4. Deactivate chip select
+   W25_CS_DISABLE();
+
+   return LFS_ERR_OK;
+}
+
+// page program and flash erase helper function
+// assumes the chip select is active, and the calling routine
+// is waiting for status register 1 busy bit to clear
+// returns: 0:success, 1:timeout
+uint8_t poll_busy_until_clear(uint32_t timeout) {
+   uint32_t elapsed_ms;
+   uint32_t entry_ms = SYSTICK_GetTickCounter();
+
+   // Poll status register1 until BUSY clears or elapsed time exceeds timeout
+   uint8_t status;
+   uint8_t rdsr1 = W25_CMD_READ_STATUS_REG_1;
+   do {
+      // 1. Activate chip select
+      W25_CS_ENABLE();
+      
+      // 2. Issue SPI write and read functions to read in status1
+      SERCOM1_SPI_Write(&rdsr1, 1);
+      SERCOM1_SPI_Read(&status, 1);
+      
+      // 3. Deactivate chip select
+      W25_CS_DISABLE(); 
+      
+      status &= W25_STATUS1_BUSY;
+      elapsed_ms = SYSTICK_GetTickCounter() - entry_ms;
+   } while ( status && (elapsed_ms < timeout)); // loop while busy and not timeout
+   //log_msg("%s: elapsed_ms: %lu\n",__func__,elapsed_ms);
+   return status;
+}
+
+// New page program function
+// Winbond 8.2.15 Page Program (02h)
+// Write one byte up to 256 bytes (a page) of data (original comment - now supports multiple page writes)
+// This function has been upgraded to write multiple pages, using multiple page write commands.
+// LittleFS is unaware of the page boundary issue.  Manage the issue with multiple writes
+int lfs_prog(const struct lfs_config *c, lfs_block_t block,
+             lfs_off_t off, const void *buffer, lfs_size_t size)
+{
+   uint32_t address = block * c->block_size + off;
+   uint8_t *src = (uint8_t*)buffer;
+
+   // 1. Issue write enable command
+   W25_CS_ENABLE();
+   uint8_t cmd = W25_CMD_WRITE_ENABLE;
+   SERCOM1_SPI_Write(&cmd, 1);
+   W25_CS_DISABLE();
+   
+   while (size > 0) {
+      // Calculate chunk size within current 256-byte page
+      uint32_t page_offset = address % W25_PROGRAM_PAGE_SIZE;
+      uint32_t chunk = W25_PROGRAM_PAGE_SIZE - page_offset;
+      if (chunk > size) chunk = size;
+      
+      // 2. Activate chip select
+      W25_CS_ENABLE();
+
+      // 3. Create and issue page program command
+      uint8_t cmd[4] = {W25_CMD_PAGE_PROGRAM,address>>16,address>>8,address};
+      SERCOM1_SPI_Write(cmd, sizeof(cmd));
+
+      // 3. Write data payload
+      SERCOM1_SPI_Write(src, chunk);
+      
+      // 4. Deactivate chip select
+      W25_CS_DISABLE();     
+
+      // 5) Poll BUSY until clear (with timeout)
+      uint8_t busy = poll_busy_until_clear(PAGE_PROGRAM_TIMEOUT);
+      if (busy) {
+         //log_msg("%s timeout waiting for program at 0x%06lX\n", __func__, (unsigned long)address);
+         return LFS_ERR_IO;
+      }
+
+      // Advance
+      address += chunk;
+      src     += chunk;
+      size    -= chunk;
+   }
+
+   return LFS_ERR_OK;
+}
+
+// New Erase function
+int lfs_erase(const struct lfs_config *c, lfs_block_t block)
+{
+   uint32_t address = block * c->block_size;
+   
+   // 1. Issue write enable command
+   // 2. Activate chip select
+   W25_CS_ENABLE();
+   uint8_t we = W25_CMD_WRITE_ENABLE;
+   SERCOM1_SPI_Write(&we, 1);
+   // 3. Deactivate chip select
+   W25_CS_DISABLE();
+   
+   // 4. Activate chip select
+   W25_CS_ENABLE();   
+   
+   // 5. Create and issue sector erase command sequence
+   uint8_t cmd[4] = {W25_CMD_SECTOR_ERASE,address>>16,address>>8,address};
+   SERCOM1_SPI_Write(cmd , sizeof(cmd));
+   
+   // 6. Deactivate chip select
+   W25_CS_DISABLE();
+   
+   // 7. Poll status register1 until BUSY clears
+   poll_busy_until_clear(SECTOR_ERASE_TIMEOUT);
+
+   return LFS_ERR_OK;
+}
 
 int lfs_sync(const struct lfs_config *c)
 {
@@ -69,12 +206,8 @@ lfs_t lfs;
 
 #define READ_SIZE               1   // Minimum size of a block read. All read operations will be a multiple of this value.
 #define PROGRAM_SIZE            1   // Minimum size of a block program. All program operations will be a multiple of this value.
-#define CACHE_SIZE              256 // Used for both read and program buffers
-#define LOOKAHEAD_CACHE_SIZE    256
-
-uint8_t read_buffer[CACHE_SIZE];
-uint8_t program_buffer[CACHE_SIZE];
-uint8_t lookahead_buffer[LOOKAHEAD_CACHE_SIZE];
+#define CACHE_SIZE              32  // Used for both read and program buffers
+#define LOOKAHEAD_CACHE_SIZE    32
 
 const struct lfs_config lfs_cfg =
 {
@@ -91,63 +224,118 @@ const struct lfs_config lfs_cfg =
     .cache_size = CACHE_SIZE,            // cache_size - multiple of read and program block size
     .lookahead_size = LOOKAHEAD_CACHE_SIZE, // lookahead_size (multiple of 8)
     
-    .read_buffer = &read_buffer,            // read_buffer
-    .prog_buffer = &program_buffer,         // prog_buffer
-    .lookahead_buffer = &lookahead_buffer,  // lookahead_buffer
+    //.read_buffer = &read_buffer,            // read_buffer
+    //.prog_buffer = &program_buffer,         // prog_buffer
+    
+    .read_buffer = NULL,                    // let lfs allocate per file
+    .prog_buffer = NULL,
+    
+    .lookahead_buffer = NULL,           // lookahead_buffer
 
     .name_max = LFS_NAME_MAX,           // name_max
     .file_max = LFS_FILE_MAX,           // file_max
     .attr_max = LFS_ATTR_MAX,           // attr_max
 };
 
-// Initialize file system
-int lfs_init(void) {
-	log_msg("%s: Checking file system...\n",__func__);
-    // Test the buffers.  Are they all non-zero?
-    if(!lfs_cfg.read_buffer || !lfs_cfg.prog_buffer) {
-        log_msg("Buffer problems!! read_buffer: 0x%08lX, program_buffer: 0x%08lX\n",
-          (uint32_t)lfs_cfg.read_buffer, (uint32_t)lfs_cfg.prog_buffer);   
-        return -1;
-    }
-    
-    // mount the filesystem
-    int rc = lfs_mount(&lfs, &lfs_cfg);
-    log_msg("lfs_mount - returned: %d\r\n",rc);
-    // reformat if we can't mount the filesystem
-    // this should only happen on the first boot
-    if (rc != LFS_ERR_OK) {
-        log_msg("%s: lfs_mount() error, reformatting FS\n",__func__);
-        rc = lfs_format(&lfs, &lfs_cfg);
-        log_msg("lfs_format - returned: %d\n",rc);
-        rc = lfs_mount(&lfs, &lfs_cfg);
-        log_msg("lfs_mount - returned: %d\n",rc);
-    }
-#if 0
-    // read current count
-    uint32_t boot_count = 55;
-    rc = lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
-    if(rc != LFS_ERR_OK) log_msg("lfs_file_open - returned: %d\n",err);
-    int count = lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
-    if(count < 0) log_msg("lfs_file_read - returned: %d\n",err);
-    //log_msg("%s() read boot_count: %u\r\n",__func__,boot_count);
-    // update boot count
-    boot_count += 1;
-    //log_msg("%s() writing boot_count: %u\r\n",__func__,boot_count);
-    lfs_file_rewind(&lfs, &file);
-    lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
+uint32_t boot_count = 0;   // global accessible by other clients
 
-    // remember the storage is not updated until the file is closed successfully
+int update_bootcount(void) {
+    const char boot_count_name[] = "boot_count.txt";
+    lfs_file_t file;
+    char buf[16]; // enough for "4294967295\0"
+
+    // Open or create the file
+    int rc = lfs_file_open(&lfs, &file, boot_count_name,
+                           LFS_O_RDWR | LFS_O_CREAT);
+    if (rc < 0) {
+        log_msg("%s: lfs_file_open failed rc=%d\n", __func__, rc);
+        return rc;
+    }
+
+    // Read existing string
+    int count = lfs_file_read(&lfs, &file, buf, sizeof(buf)-1);
+    if (count < 0) {
+        log_msg("%s: lfs_file_read failed rc=%d\n", __func__, count);
+        lfs_file_close(&lfs, &file);
+        return count;
+    }
+    buf[count] = '\0'; // ensure null termination
+
+    // Convert to integer
+    if (count > 0) {
+        boot_count = (uint32_t)strtoul(buf, NULL, 10);
+    } else {
+        boot_count = 0; // file was empty
+    }
+
+    // Increment
+    boot_count++;
+
+    // Rewind and overwrite with new string
+    lfs_file_rewind(&lfs, &file);
+    snprintf(buf, sizeof(buf), "%u", boot_count);
+    rc = lfs_file_write(&lfs, &file, buf, strlen(buf));
+    if (rc < 0) {
+        log_msg("%s: lfs_file_write failed rc=%d\n", __func__, rc);
+        lfs_file_close(&lfs, &file);
+        return rc;
+    }
+
+    // Close file to commit changes
     lfs_file_close(&lfs, &file);
 
-    // release any resources we were using
-    lfs_unmount(&lfs);
-
-    // print the boot count
+    // Print the boot count
     log_msg("boot_count: %u\n", boot_count);
-#endif
-    //log_msg("-%s()\r\n",__func__);    
-    return rc;
+
+    return 0;
 }
+
+// Initialize LittleFS: try mount up to 5 times with backoff,
+// then format once if mount fails. Return 0 on success, <0 on error.
+int lfs_init(lfs_t *lfs, const struct lfs_config *cfg) {
+    log_msg("%s: Checking file system...\n",__func__);
+    int rc;
+    uint32_t backoff = 10; // initial backoff in ms
+    
+    // Initial delay following reset
+    SYSTICK_DelayMs(50);
+
+    // Try mounting up to 5 times
+    for (int attempt = 1; attempt <= 5; attempt++) {
+        rc = lfs_mount(lfs, cfg);
+        if (rc == 0) {
+            //log_msg("lfs_init: mount succeeded on attempt %d\n", attempt);
+            update_bootcount();
+            return 0;
+        }
+        log_msg("lfs_init: mount attempt %d failed (rc=%d)\n", attempt, rc);
+
+        // Backoff before next attempt
+        SYSTICK_DelayMs(backoff);
+        backoff *= 2; // exponential backoff
+    }
+
+    // If all mount attempts failed, try format once
+    log_msg("lfs_init: formatting filesystem...\n");
+    rc = lfs_format(lfs, cfg);
+    if (rc != 0) {
+        log_msg("lfs_init: format failed (rc=%d)\n", rc);
+        return rc; // unrecoverable error
+    }
+
+    // After format, try mount once more
+    rc = lfs_mount(lfs, cfg);
+    if (rc != 0) {
+        log_msg("lfs_init: mount after format failed (rc=%d)\n", rc);
+        return rc;
+    }
+
+    //log_msg("lfs_init: format + mount succeeded\n");
+    update_bootcount();
+    
+    return 0;
+}
+
 
 //=================================================================================================
 // Command Line functions that interface with LittleFS
@@ -181,6 +369,7 @@ int cl_dir(void)
 	uint32_t file_count = 0;
 	// When iterating through files & directories within a directory, LittleFS will always present
 	// "." and ".." as directories within the current directory.
+   // lfs_dir_read() returns number of entries read)
 	while(lfs_dir_read(&lfs, &dir, &info) >0) {
 		// Directory info update, display data
 		if(info.type == LFS_TYPE_DIR) {

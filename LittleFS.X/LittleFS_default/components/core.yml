@@ -1660,6 +1660,16 @@ data:
           type: User
         type: Values
       type: KeyValueSet
+    XC32_HEAP_SIZE:
+      attributes:
+        id: XC32_HEAP_SIZE
+      children:
+      - children:
+        - attributes:
+            value: '4096'
+          type: User
+        type: Values
+      type: Integer
   userData:
     children:
     - attributes:
