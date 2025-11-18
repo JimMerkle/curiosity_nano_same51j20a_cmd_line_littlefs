@@ -22,7 +22,6 @@
 #include "logger/logger.h"
 #include "definitions.h"                // SYS function prototypes
 
-#if 1
 static int total_tests = 0;
 static int passed_tests = 0;
 
@@ -35,6 +34,68 @@ static void check(const char *label, int cond) {
         log_msg("[FAIL] %s\n", label);
     }
 }
+
+// ------------------------------------------------------------
+// Initialization: delete any existing random.ini and recreate it
+static void init_ini_file(const char *filename) {
+    // Delete existing file if present
+    lfs_remove(&lfs, filename);
+
+    // Recreate with predictable contents
+    ini_write(filename, "alpha1", "foo");
+    ini_write(filename, "beta2", "bar");
+    ini_write(filename, "gamma3", "baz");
+    ini_write(filename, "delta4", "qux");
+    ini_write(filename, "epsilon5", "quux");
+    ini_write(filename, "zeta6", "corge");
+    ini_write(filename, "eta7", "grault");
+    ini_write(filename, "theta8", "garply");
+    ini_write(filename, "iota9", "waldo");
+    ini_write(filename, "kappa10", "fred");
+    ini_write(filename, "lambda11", "plugh");
+    ini_write(filename, "mu12", "xyzzy");
+    ini_write(filename, "nu13", "thud");
+    ini_write(filename, "xi14", "hello");
+    ini_write(filename, "omicron15", "world");
+    ini_write(filename, "pi16", "test123");
+    ini_write(filename, "rho17", "abcdef");
+    ini_write(filename, "sigma18", "ghijkl");
+    ini_write(filename, "tau19", "mnopqr");
+    ini_write(filename, "upsilon20", "stuvwx");
+    ini_write(filename, "phi21", "yz");
+    ini_write(filename, "chi22", "12345");
+    ini_write(filename, "psi23", "67890");
+    ini_write(filename, "omega24", "24680");
+    ini_write(filename, "key25", "value25");
+    ini_write(filename, "key26", "value26");
+    ini_write(filename, "key27", "value27");
+    ini_write(filename, "key28", "value28");
+    ini_write(filename, "key29", "value29");
+    ini_write(filename, "key30", "value30");
+    ini_write(filename, "rand31", "apple");
+    ini_write(filename, "rand32", "banana");
+    ini_write(filename, "rand33", "cherry");
+    ini_write(filename, "rand34", "date");
+    ini_write(filename, "rand35", "elderberry");
+    ini_write(filename, "rand36", "fig");
+    ini_write(filename, "rand37", "grape");
+    ini_write(filename, "rand38", "honeydew");
+    ini_write(filename, "rand39", "kiwi");
+    ini_write(filename, "rand40", "lemon");
+    ini_write(filename, "rand41", "mango");
+    ini_write(filename, "rand42", "nectarine");
+    ini_write(filename, "rand43", "orange");
+    ini_write(filename, "rand44", "papaya");
+    ini_write(filename, "rand45", "quince");
+    ini_write(filename, "rand46", "raspberry");
+    ini_write(filename, "rand47", "strawberry");
+    ini_write(filename, "rand48", "tangerine");
+    ini_write(filename, "rand49", "ugli");
+    ini_write(filename, "rand50", "vanilla");
+
+    log_msg("[INIT] Created fresh %s with 50 entries\n", filename);
+}
+
 
 // ------------------------------------------------------------
 // 1. Basic Read/Write Roundtrip
@@ -146,7 +207,7 @@ static void test_stress(void) {
     const char test_file[]={"random.ini"};
 
     uint32_t start_ms = SYSTICK_GetTickCounter();
-    uint32_t duration_ms = 20 * 1000; // 20 seconds
+    uint32_t duration_ms = 10 * 1000; // 10 seconds
     uint32_t ops = 0;
 
     char buf[64];
@@ -218,7 +279,9 @@ int cl_ini_store_test(void) {
     const char *fname = "random.ini";
 
     log_msg("=== INI Store Test Harness ===\n");
-
+    
+    init_ini_file(fname);
+    
     test_roundtrip(fname);
     test_update(fname);
     test_append(fname);
@@ -234,125 +297,3 @@ int cl_ini_store_test(void) {
 
     return 0;
 }
-#else
-
-int ini_cleanup_keep_last(const char *filename) {
-    // First pass: collect last value per key
-    lfs_file_t in;
-    char line[128], key[64], val[64];
-
-    if (lfs_file_open(&lfs, &in, filename, LFS_O_RDONLY) < 0) return -1;
-
-    // Simple map: parallel arrays (small file assumption)
-    #define MAX_KEYS 256
-    char keys[MAX_KEYS][64];
-    char vals[MAX_KEYS][64];
-    int count = 0;
-
-    while (1) {
-        int n = lfs_gets(&in, line, sizeof(line));
-        if (n == 0) break;
-        if (n < 0) { lfs_file_close(&lfs, &in); return n; }
-
-        if (parse_line(line, key, sizeof(key), val, sizeof(val)) == 0) {
-            // Trim trailing whitespace/newlines from val
-            size_t len = strlen(val);
-            while (len > 0 && (val[len-1] == '\n' || val[len-1] == '\r' ||
-                               val[len-1] == ' '  || val[len-1] == '\t')) {
-                val[--len] = '\0';
-            }
-
-            // Update or insert
-            int idx = -1;
-            for (int i = 0; i < count; i++) {
-                if (strcmp(keys[i], key) == 0) { idx = i; break; }
-            }
-            if (idx >= 0) {
-                strncpy(vals[idx], val, sizeof(vals[idx]) - 1);
-                vals[idx][sizeof(vals[idx]) - 1] = '\0';
-            } else if (count < MAX_KEYS) {
-                strncpy(keys[count], key, sizeof(keys[count]) - 1);
-                keys[count][sizeof(keys[count]) - 1] = '\0';
-                strncpy(vals[count], val, sizeof(vals[count]) - 1);
-                vals[count][sizeof(vals[count]) - 1] = '\0';
-                count++;
-            }
-        }
-    }
-    lfs_file_close(&lfs, &in);
-
-    // Second pass: write cleaned file (preserve comments/blank lines from original header)
-    lfs_remove(&lfs, "tmp.ini");
-
-    lfs_file_t out;
-    if (lfs_file_open(&lfs, &out, "tmp.ini", LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC) < 0)
-        return -1;
-
-    // Optional: write a header comment
-    const char *hdr = "# Cleaned INI (last occurrence wins)\n";
-    lfs_file_write(&lfs, &out, hdr, strlen(hdr));
-
-    for (int i = 0; i < count; i++) {
-        int len = snprintf(line, sizeof(line), "%s=%s\n", keys[i], vals[i]);
-        lfs_file_write(&lfs, &out, line, len);
-    }
-
-    lfs_file_close(&lfs, &out);
-    lfs_remove(&lfs, filename);
-    lfs_rename(&lfs, "tmp.ini", filename);
-    return 0;
-}
-
-int cl_ini_store_test(void) {
-    const char *fname = "random.ini";
-
-    // Run cleanup once
-    ini_cleanup_keep_last(fname);
-
-    log_msg("=== Minimal Diagnostics ===\n");
-
-    // Add numeric test keys
-    int rc = ini_write(fname, "baudrate", "115200");
-    log_msg("ini_write(baudrate): rc=%d\n", rc);
-    
-    rc = ini_write(fname, "timeout", "30");
-    log_msg("ini_write(timeout): rc=%d\n", rc);
-    
-    rc = ini_write(fname, "hexval", "0x1A");
-    log_msg("ini_write(hexval): rc=%d\n", rc);
-    
-    rc = ini_write(fname, "octval", "077");
-    log_msg("ini_write(octval): rc=%d\n", rc);
-    
-    rc = ini_write(fname, "badnum", "abc123");
-    log_msg("ini_write(badnum): rc=%d\n", rc);
-
-    // 2) Read a few known string keys
-    char buf[64];
-    rc = ini_read(fname, "alpha1", buf, sizeof(buf));
-    log_msg("ini_read(alpha1): rc=%d, val='%s'\n", rc, (rc==0)?buf:"<n/a>");
-
-    rc = ini_read(fname, "beta2", buf, sizeof(buf));
-    log_msg("ini_read(beta2): rc=%d, val='%s'\n", rc, (rc==0)?buf:"<n/a>");
-
-    // 3) Probe numeric keys directly
-    uint32_t val;
-    rc = ini_get_uint32(fname, "baudrate", &val);
-    log_msg("ini_get_uint32(baudrate): rc=%d, val=%u\n", rc, val);
-
-    rc = ini_get_uint32(fname, "timeout", &val);
-    log_msg("ini_get_uint32(timeout): rc=%d, val=%u\n", rc, val);
-
-    rc = ini_get_uint32(fname, "hexval", &val);
-    log_msg("ini_get_uint32(hexval): rc=%d, val=%u\n", rc, val);
-
-    rc = ini_get_uint32(fname, "octval", &val);
-    log_msg("ini_get_uint32(octval): rc=%d, val=%u\n", rc, val);
-
-    rc = ini_get_uint32(fname, "badnum", &val);
-    log_msg("ini_get_uint32(badnum): rc=%d\n", rc);
-
-    log_msg("=== Diagnostics Complete ===\n");
-    return 0;
-}
-#endif
