@@ -33,9 +33,9 @@
 #include "command_line/command_line.h"
 #include "ymodem/ymodem.h"
 
-#define YMODEM_DEBUG  1
+//#define YMODEM_DEBUG
 
-#if YMODEM_DEBUG
+#ifdef YMODEM_DEBUG
 #define PRINTF_BUF_SIZE             128
 
 // Debug message using SERCOM2 - FTDI module
@@ -65,7 +65,7 @@ int dbg_msg(const char *fmt, ...) {
     return 0;
 } // dbg_msg())
 #else
-#define int dbg_msg(fmt, ...) /* define out of existance */
+#define dbg_msg(fmt, ...) ((void)0)
 #endif // YMODEM_DEBUG
 
 //// ---- External hooks you must provide in your project ----
