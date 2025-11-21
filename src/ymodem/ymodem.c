@@ -544,7 +544,8 @@ int ymodem_transmit(const char *path) {
             return -1;
         }
     }
-
+#if 0
+    // Use this for single file transmit only..  It stops Y-Modem batch
     // After EOT/ACK, receiver sends 'C' to invite next file or end batch
     {
         uint8_t resp;
@@ -563,7 +564,8 @@ int ymodem_transmit(const char *path) {
             }
         }
     }
-
+#endif
+    
     lfs_file_close(&lfs, &ctx.file);
     dbg_msg("[YMTX] done\n");
     return 0;
@@ -586,7 +588,7 @@ int cl_ymodem(int argc, char *argv[]) {
 }
 */
 
-
+#if 0
 int cl_ymodem(void) {
    dbg_msg("+%s\n",__func__);
    if(argc > 1) {
@@ -600,3 +602,42 @@ int cl_ymodem(void) {
    }
    return 0;
 }
+#else
+int cl_ymodem(void) {
+    dbg_msg("+%s\n", __func__);
+
+    if (argc > 1) {
+        // Multi-file transmit
+        for (int i = 1; i < argc; i++) {
+            dbg_msg("Y-Modem Transmit, file: %s\n", argv[i]);
+            int rc = ymodem_transmit(argv[i]);
+            if (rc != 0) {
+                dbg_msg("Transmit error on %s (rc=%d)\n", argv[i], rc);
+                return rc;
+            }
+        }
+
+        // After last file, send empty block0 to end batch
+        uint8_t resp;
+        if (ymodem_getc(&resp, YM_IO_TIMEOUT_MS) == 0 && resp == CRC_REQ) {
+            uint8_t empty[YM_BLOCK_SIZE_128] = {0};
+            if (ymodem_send_packet(SOH, 0, empty, YM_BLOCK_SIZE_128) != 0) {
+                dbg_msg("[YMTX] send empty block0 failed\n");
+                return -1;
+            }
+            if (ymodem_getc(&resp, YM_IO_TIMEOUT_MS) != 0 || resp != ACK) {
+                dbg_msg("[YMTX] no ACK for empty block0\n");
+                return -1;
+            }
+        }
+
+        dbg_msg("[YMTX] batch transmit done\n");
+        return 0;
+    } else {
+        // No args ? receive mode
+        dbg_msg("Y-Modem Receive\n");
+        return ymodem_receive();
+    }
+}
+
+#endif
