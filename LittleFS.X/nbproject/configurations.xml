@@ -36,6 +36,7 @@
               <logicalFolder name="usart" displayName="usart" projectFiles="true">
                 <itemPath>../src/config/default/peripheral/sercom/usart/plib_sercom5_usart.h</itemPath>
                 <itemPath>../src/config/default/peripheral/sercom/usart/plib_sercom_usart_common.h</itemPath>
+                <itemPath>../src/config/default/peripheral/sercom/usart/plib_sercom2_usart.h</itemPath>
               </logicalFolder>
             </logicalFolder>
             <logicalFolder name="systick" displayName="systick" projectFiles="true">
@@ -198,6 +199,9 @@
       <logicalFolder name="f4" displayName="xmodem" projectFiles="true">
         <itemPath>../src/xmodem/crc16.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f6" displayName="ymodem" projectFiles="true">
+        <itemPath>../src/ymodem/ymodem.h</itemPath>
+      </logicalFolder>
       <itemPath>../src/version.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -208,6 +212,7 @@
                      projectFiles="true">
         <logicalFolder name="components" displayName="components" projectFiles="true">
           <itemPath>LittleFS_default/components/sercom1.yml</itemPath>
+          <itemPath>LittleFS_default/components/sercom2.yml</itemPath>
           <itemPath>LittleFS_default/components/cmsis.yml</itemPath>
           <itemPath>LittleFS_default/components/core.yml</itemPath>
           <itemPath>LittleFS_default/components/evsys.yml</itemPath>
@@ -267,6 +272,7 @@
               </logicalFolder>
               <logicalFolder name="usart" displayName="usart" projectFiles="true">
                 <itemPath>../src/config/default/peripheral/sercom/usart/plib_sercom5_usart.c</itemPath>
+                <itemPath>../src/config/default/peripheral/sercom/usart/plib_sercom2_usart.c</itemPath>
               </logicalFolder>
             </logicalFolder>
             <logicalFolder name="systick" displayName="systick" projectFiles="true">
@@ -303,6 +309,9 @@
       <logicalFolder name="f4" displayName="xmodem" projectFiles="true">
         <itemPath>../src/xmodem/crc16.c</itemPath>
         <itemPath>../src/xmodem/xmodem.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f6" displayName="ymodem" projectFiles="true">
+        <itemPath>../src/ymodem/ymodem.c</itemPath>
       </logicalFolder>
       <itemPath>../src/main.c</itemPath>
     </logicalFolder>
@@ -566,6 +575,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-fffff"/>
         <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/jim/Documents/MPLABX_Projects/curiosity_nano_same51j20a_cmd_line_littlefs/LittleFS.X/debug/default/LittleFS_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"

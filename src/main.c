@@ -58,14 +58,32 @@ int main ( void )
     
    // Mount LittleFS 
    lfs_init(&lfs, &lfs_cfg);
+   
+
 
    while ( true )
    {
-       /* Maintain state machines of all polled MPLAB Harmony modules. */
-       //SYS_Tasks ( ); // Nothing here at this time
-       cl_loop();
-       LED_PA14_AL_Toggle();
-       SYSTICK_DelayMs(50);
+      /* Maintain state machines of all polled MPLAB Harmony modules. */
+      //SYS_Tasks ( ); // Nothing here at this time
+      cl_loop();
+      LED_PA14_AL_Toggle();
+      SYSTICK_DelayMs(50);
+#if 0
+      // if sercom2 character available, grab it and write it 10 times, else
+      // show "hello" message
+      const char sercom2_msg[]={"Hello from SERCOM2\n"};
+      char buff[16];
+      if(SERCOM2_USART_ReadCountGet() > 0) {
+         SERCOM2_USART_Read((uint8_t *)buff, 1); // get 1 char
+         for(unsigned i=1;i<10;i++) {
+            buff[i] = buff[0];
+         }
+         buff[10] = '\n';
+         SERCOM2_USART_Write((uint8_t *)buff, 11 );
+      } else {
+         SERCOM2_USART_Write((uint8_t *)sercom2_msg, sizeof(sercom2_msg)-1 );
+      }
+#endif
 
    }
 

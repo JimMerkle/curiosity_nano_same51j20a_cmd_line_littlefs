@@ -26,6 +26,7 @@
 #include "sam.h"
 #include "logger/logger.h"     // send output though "logger" module
 #include "version.h"
+#include "ymodem/ymodem.h"
 
 // Typedefs
 typedef struct {
@@ -45,6 +46,7 @@ const COMMAND_ITEM cmd_table[] = {
     {"logger",    "Log message test",                                       cl_logger_test},
     {"sx",        "send xmodem <file>",                                     cl_xmodem_send},
     {"rx",        "receive xmodem <file>",                                  cl_xmodem_receive},
+    {"ymodem",    "ymodem <file> to send a file, else receive file",        cl_ymodem},
 	 {"version",   "display firmware version",                               cl_version},
     {"initest",   "test the ini_store key-value pair storage",              cl_ini_store_test},
     {"==========","==========================================",             NULL},

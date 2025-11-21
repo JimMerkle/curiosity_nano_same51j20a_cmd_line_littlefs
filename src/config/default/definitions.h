@@ -48,6 +48,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "peripheral/sercom/usart/plib_sercom2_usart.h"
 #include "peripheral/nvmctrl/plib_nvmctrl.h"
 #include "peripheral/sercom/spi_master/plib_sercom1_spi_master.h"
 #include "peripheral/evsys/plib_evsys.h"

@@ -34,7 +34,7 @@
 // And build littlefs with the header by defining LFS_DEFINES.
 // (-DLFS_DEFINES=my_defines.h)
 
-//#include "logger/logger.h"
+#include "logger/logger.h"
 //#define LFS_NO_ASSERT 1
 //#define LFS_YES_TRACE 1
 //#define LFS_NO_DEBUG    1
