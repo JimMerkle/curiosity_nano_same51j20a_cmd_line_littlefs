@@ -4,12 +4,31 @@
 
 #include <stdio.h> // printf()
 #include <stdlib.h> // malloc()
+#include <string.h>
+#include <string.h>
+#include <string.h>
 #include "w25q128.h"
 #include "lfs.h"
 #include "littlefs/lfs_interface.h" // PARAMETER_NOT_USED
 #include "command_line/command_line.h" // argc, argv
 #include "logger/logger.h"
 #include "definitions.h"                // SYS function prototypes
+
+#if 0
+typedef struct {
+   uint32_t erase_start;      // Enter function
+   uint32_t write_enable;     // Enable complete
+   uint32_t erase_command;    // Command complete
+   uint32_t busy_poll;        // Polling complete (leaving function)
+} ERASE_TIMING;
+
+#define FLASH_TIME_ARRAY_SIZE 50
+// Array to hold FLASH Erase value
+ERASE_TIMING flash_erase_times[FLASH_TIME_ARRAY_SIZE] = {0};
+//uint32_t flash_program_times[FLASH_TIME_ARRAY_SIZE] = {0};
+int erase_count = 0;
+//int program_count = 0;
+#endif
 
 #if 0
 // Older original code using the W25Q128 functions
@@ -166,6 +185,7 @@ int lfs_prog(const struct lfs_config *c, lfs_block_t block,
 // New Erase function
 int lfs_erase(const struct lfs_config *c, lfs_block_t block)
 {
+   //if(erase_count<FLASH_TIME_ARRAY_SIZE) {flash_erase_times[erase_count].erase_start = DWT_CounterGet();}
    uint32_t address = block * c->block_size;
    
    // 1. Issue write enable command
@@ -175,7 +195,7 @@ int lfs_erase(const struct lfs_config *c, lfs_block_t block)
    SERCOM1_SPI_Write(&we, 1);
    // 3. Deactivate chip select
    W25_CS_DISABLE();
-   
+   //if(erase_count<FLASH_TIME_ARRAY_SIZE) {flash_erase_times[erase_count].write_enable = DWT_CounterGet();}   
    // 4. Activate chip select
    W25_CS_ENABLE();   
    
@@ -185,10 +205,13 @@ int lfs_erase(const struct lfs_config *c, lfs_block_t block)
    
    // 6. Deactivate chip select
    W25_CS_DISABLE();
-   
+   //if(erase_count<FLASH_TIME_ARRAY_SIZE) {flash_erase_times[erase_count].erase_command = DWT_CounterGet();} 
    // 7. Poll status register1 until BUSY clears
    poll_busy_until_clear(SECTOR_ERASE_TIMEOUT);
-
+   
+   //if(erase_count<FLASH_TIME_ARRAY_SIZE) {flash_erase_times[erase_count].busy_poll = DWT_CounterGet();} 
+   //erase_count++;
+   
    return LFS_ERR_OK;
 }
 
@@ -211,30 +234,30 @@ lfs_t lfs;
 
 const struct lfs_config lfs_cfg =
 {
-    .context = NULL, // not implemented
-    .read = lfs_read,   // read function
-    .prog = lfs_prog,   // program function
-    .erase = lfs_erase,  // erase function
-    .sync = lfs_sync,   // sync function
-    .read_size = READ_SIZE,              // minimum read size (Our Flash interface supports single byte reads)
-    .prog_size = PROGRAM_SIZE,           // Minimum size of a block program. All program operations will be a multiple of this value.
-    .block_size = W25_SECTOR_SIZE,       // block_size - 4KByte erase sectors
-    .block_count = W25_SECTOR_COUNT,     // block_count - number of sectors        
-    .block_cycles = 512,                 // block_cycles - suggested value: 100 - 1000
-    .cache_size = CACHE_SIZE,            // cache_size - multiple of read and program block size
-    .lookahead_size = LOOKAHEAD_CACHE_SIZE, // lookahead_size (multiple of 8)
-    
-    //.read_buffer = &read_buffer,            // read_buffer
-    //.prog_buffer = &program_buffer,         // prog_buffer
-    
-    .read_buffer = NULL,                    // let lfs allocate per file
-    .prog_buffer = NULL,
-    
-    .lookahead_buffer = NULL,           // lookahead_buffer
+   .context = NULL, // not implemented
+   .read = lfs_read,   // read function
+   .prog = lfs_prog,   // program function
+   .erase = lfs_erase,  // erase function
+   .sync = lfs_sync,   // sync function
+   .read_size = READ_SIZE,              // minimum read size (Our Flash interface supports single byte reads)
+   .prog_size = PROGRAM_SIZE,           // Minimum size of a block program. All program operations will be a multiple of this value.
+   .block_size = W25_SECTOR_SIZE,       // block_size - 4KByte erase sectors
+   .block_count = W25_SECTOR_COUNT,     // block_count - number of sectors        
+   .block_cycles = 512,                 // block_cycles - suggested value: 100 - 1000
+   .cache_size = CACHE_SIZE,            // cache_size - multiple of read and program block size
+   .lookahead_size = LOOKAHEAD_CACHE_SIZE, // lookahead_size (multiple of 8)
 
-    .name_max = LFS_NAME_MAX,           // name_max
-    .file_max = LFS_FILE_MAX,           // file_max
-    .attr_max = LFS_ATTR_MAX,           // attr_max
+   //.read_buffer = &read_buffer,            // read_buffer
+   //.prog_buffer = &program_buffer,         // prog_buffer
+
+   .read_buffer = NULL,                // let lfs allocate per file
+   .prog_buffer = NULL,
+
+   .lookahead_buffer = NULL,           // lookahead_buffer
+
+   .name_max = LFS_NAME_MAX,           // name_max
+   .file_max = LFS_FILE_MAX,           // file_max
+   .attr_max = LFS_ATTR_MAX,           // attr_max
 };
 
 uint32_t boot_count = 0;   // global accessible by other clients
@@ -293,7 +316,7 @@ int update_bootcount(void) {
 // Initialize LittleFS: try mount up to 5 times with backoff,
 // then format once if mount fails. Return 0 on success, <0 on error.
 int lfs_init(lfs_t *lfs, const struct lfs_config *cfg) {
-    log_msg("%s: Checking file system...\n",__func__);
+    //log_msg("%s: Checking file system...\n",__func__);
     int rc;
     uint32_t backoff = 10; // initial backoff in ms
     
@@ -411,6 +434,46 @@ int cl_make_dir(void)
     return LFS_ERR_OK;
 }
 
+
+/* Comment to disable wildcard remove support in cl_remove()
+    Example patterns: "*.txt", "log?", "subdir/*.bin" */
+#define WILD_REMOVE 1
+
+#ifdef WILD_REMOVE
+/* Simple wildcard matcher supporting '*' and '?' */
+static int wildcard_match(const char *pattern, const char *str) {
+    const char *s = str;
+    const char *p = pattern;
+    const char *star = NULL;
+    const char *ss = NULL;
+
+    while (*s) {
+        if (*p == '*') {
+            while (*p == '*') p++; /* collapse multiple '*' */
+            if (!*p) return 1; /* trailing '*' matches rest */
+            star = p;
+            ss = s;
+            continue;
+        }
+        if (*p == '?' || *p == *s) {
+            p++; s++;
+            continue;
+        }
+        if (star) {
+            /* backtrack: advance match in s */
+            ss++;
+            s = ss;
+            p = star;
+            continue;
+        }
+        return 0;
+    }
+    while (*p == '*') p++;
+    return (*p == '\0');
+}
+#endif /* WILD_REMOVE */
+
+
 // Remove a file / directory..  Required 1 argument, the directory name
 int cl_remove(void)
 {
@@ -419,6 +482,69 @@ int cl_remove(void)
         log_msg("\nExpect <file/directory name>\n");
         return 0;
     }
+    const char *arg = argv[1];
+
+#ifdef WILD_REMOVE
+    /* If argument contains wildcard characters, perform directory scan & remove matches */
+    const char *p = arg;
+    int has_wild = 0;
+    while (*p) { if (*p == '*' || *p == '?') { has_wild = 1; break; } p++; }
+
+    if (has_wild) {
+        /* Split into directory and pattern parts (e.g. "subdir/*.bin") */
+        const char *slash = strrchr(arg, '/');
+        char dirbuf[LFS_NAME_MAX+2];
+        const char *dirpath;
+        const char *pattern;
+
+        if (slash) {
+            size_t dirlen = slash - arg;
+            if (dirlen == 0) {
+                dirpath = "/";
+            } else {
+                if (dirlen >= sizeof(dirbuf)) dirlen = sizeof(dirbuf)-1;
+                strncpy(dirbuf, arg, dirlen);
+                dirbuf[dirlen] = '\0';
+                dirpath = dirbuf;
+            }
+            pattern = slash + 1;
+        } else {
+            dirpath = "/"; /* search root when no directory given */
+            pattern = arg;
+        }
+
+        lfs_dir_t d;
+        struct lfs_info info;
+        int rc = lfs_dir_open(&lfs, &d, dirpath);
+        if (rc != LFS_ERR_OK) {
+            log_msg("Directory \"%s\" not found\n", dirpath);
+            return rc;
+        }
+
+        while (lfs_dir_read(&lfs, &d, &info) > 0) {
+            if (info.type == LFS_TYPE_REG || info.type == LFS_TYPE_DIR) {
+                if (wildcard_match(pattern, info.name)) {
+                    char fullpath[LFS_NAME_MAX + 32];
+                    if (strcmp(dirpath, "/") == 0) {
+                        snprintf(fullpath, sizeof(fullpath), "%s", info.name);
+                    } else {
+                        snprintf(fullpath, sizeof(fullpath), "%s/%s", dirpath, info.name);
+                    }
+                    int r = lfs_remove(&lfs, fullpath);
+                    if (r != LFS_ERR_OK) {
+                        log_msg("%s: Error removing \"%s\" rc=%d\n", __func__, fullpath, r);
+                    } else {
+                        log_msg("Removed: \"%s\"\n", fullpath);
+                    }
+                }
+            }
+        }
+        lfs_dir_close(&lfs, &d);
+        return LFS_ERR_OK;
+    }
+#endif /* WILD_REMOVE */
+
+    /* No wildcard: remove single file/dir as before */
     int retval = lfs_remove(&lfs, argv[1]);
     if(retval != LFS_ERR_OK) {
         log_msg("%s: Error removing \"%s\"\n",__func__,argv[1]);
@@ -469,23 +595,18 @@ int cl_make_file(void)
     return LFS_ERR_OK;
 }
 
-// Make a 4KByte file..  Required 1 argument, the file name
+// Make a file..
 // Record the time to create and store the file
-int cl_make_file_4kb(void)
+int make_file(const char * filename, uint32_t filesize)
 {
-    // verify argument count
-    if(argc < 2) {
-        log_msg("\nExpect <file name>\n");
-        return 0;
-    }
     lfs_file_t file;
 
     // Returns a negative error code on failure.
     int retval = lfs_file_open(&lfs, &file,
-        argv[1], LFS_O_RDWR | LFS_O_CREAT);
+        filename, LFS_O_RDWR | LFS_O_CREAT);
 
     if(retval != LFS_ERR_OK) {
-        log_msg("%s: Error creating file \"%s\"\n",__func__,argv[1]);
+        log_msg("%s: Error creating file \"%s\"\n",__func__,filename);
         return retval;
     }
 
@@ -497,8 +618,10 @@ int cl_make_file_4kb(void)
 
     uint32_t start_us = TC0_Timer32bitCounterGet(); // read us hardware timer
 
+    // Determine how many 256 byte writes will be required
+    unsigned write_loops = filesize / sizeof(buf);
     // Write the buffer to the file 16 times
-    for(unsigned count=0;count<16;count++) {
+    for(unsigned count=0;count<write_loops;count++) {
 		retval = lfs_file_write(&lfs, &file, buf, sizeof(buf));
 		if(retval < LFS_ERR_OK) {
 			log_msg("%s: Error writing file \"%s\"\n",__func__,argv[1]);
@@ -513,9 +636,31 @@ int cl_make_file_4kb(void)
     uint32_t stop_us = TC0_Timer32bitCounterGet(); // read us hardware timer
     if(stop_us < start_us) stop_us += 1<<16; // roll-over, add 16-bit roll-over offset
 
-    log_msg("Created file: \"%s\", Time: %lu us\n",argv[1],stop_us-start_us);
+    log_msg("Created file: \"%s\", Size: %u, Time: %lu us\n",filename,filesize,stop_us-start_us);
     return retval;
+} // make_file()
+
+// Make a 4KByte file..  Required 1 argument, the file name
+// Record the time to create and store the file
+int cl_make_file_4kb(void) {
+    // verify argument count
+    if(argc < 2) {
+        log_msg("\nExpect <file name>\n");
+        return 0;
+    }
+    return make_file(argv[1], 0x1000);
 } // cl_make_file_4kb()
+
+// Make a 1MByte file..  Required 1 argument, the file name
+// Record the time to create and store the file
+int cl_make_file_1mb(void) {
+    // verify argument count
+    if(argc < 2) {
+        log_msg("\nExpect <file name>\n");
+        return 0;
+    }
+    return make_file(argv[1], 0x100000);
+} // cl_make_file_1mb()
 
 void hexdump(void * address, uint32_t count, uint32_t address_value); // hexdump.c
 
@@ -872,3 +1017,25 @@ int cl_make_files_1mb(void)
     log_msg("Created 256 files in %lu ms\n",stop_ms-start_ms);
     return rc;
 } // cl_make_files1_1mb()
+
+// Assuming a 120MHz counter is used, convert 120MHz count into a us string with decimal point
+// Example: Convert 6552 counts to 54.6us
+// Convert counts at 120 MHz into "X.Y" micro-second and tenths of microsecond parts
+#define FORMAT_US(counts) ((counts)/12/10), ((counts)/12%10)
+
+#if 0
+int cl_dump_sector_erase_times(void) {
+   log_msg("%+s\n", __func__);
+   for (int i = 0; i < FLASH_TIME_ARRAY_SIZE; i++) {
+      if (!flash_erase_times[i].erase_start) break;
+
+      log_msg("i: %02d  WE: %u.%u us, EC: %u.%u us, BP: %u.%u us, Total: %u.%u us\n",
+           i,
+           FORMAT_US(flash_erase_times[i].write_enable - flash_erase_times[i].erase_start),
+           FORMAT_US(flash_erase_times[i].erase_command - flash_erase_times[i].write_enable),
+           FORMAT_US(flash_erase_times[i].busy_poll - flash_erase_times[i].erase_command),
+           FORMAT_US(flash_erase_times[i].busy_poll - flash_erase_times[i].erase_start));
+   }
+   return 0;
+}
+#endif

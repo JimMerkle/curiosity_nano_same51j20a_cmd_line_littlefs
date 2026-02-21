@@ -43,6 +43,10 @@
 /* W25Q128 chip select is active LOW */
 #define W25_CS_ENABLE()   nCS_PA18_Clear()
 #define W25_CS_DISABLE()  nCS_PA18_Set()
+// Modified SERCOM1, enabled MSSEN to use PAD2 as Hardware Slave Select
+//#define W25_CS_ENABLE()
+//#define W25_CS_DISABLE()
+// Using MSSEN doesn't appear to work.  Revert back to "manual nCS control"
 
 // Return 3 byte Manufacturer and device ID (requires 3 byte buffer)
 int W25_ReadJedecID(uint8_t *buf, int bufSize);

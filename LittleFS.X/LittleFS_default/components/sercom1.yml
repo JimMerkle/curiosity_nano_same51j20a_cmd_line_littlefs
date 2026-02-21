@@ -211,7 +211,7 @@ data:
         type: Attributes
       - children:
         - attributes:
-            value: '10000000'
+            value: '20000000'
           type: User
         type: Values
       type: Integer
@@ -222,7 +222,7 @@ data:
       - children:
         - attributes:
             id: sercom1
-            value: '2'
+            value: '0'
           type: Dynamic
         type: Values
       type: Integer
@@ -357,6 +357,24 @@ data:
     SPI_INTERRUPT_MODE:
       attributes:
         id: SPI_INTERRUPT_MODE
+      children:
+      - children:
+        - attributes:
+            id: visible
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      - children:
+        - attributes:
+            value: 'false'
+          type: User
+        type: Values
+      type: Boolean
+    SPI_MSSEN:
+      attributes:
+        id: SPI_MSSEN
       children:
       - children:
         - attributes:

@@ -727,7 +727,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x44000'
+            value: '0x4c000'
           type: Dynamic
         type: Values
       type: String
@@ -804,7 +804,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x1'
+            value: '0x41'
           type: Dynamic
         type: Values
       type: String
@@ -815,7 +815,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x1'
+            value: '0x41'
           type: Dynamic
         type: Values
       type: String
@@ -826,7 +826,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x0'
+            value: '0x40'
           type: Dynamic
         type: Values
       type: String
@@ -837,7 +837,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x1'
+            value: '0x41'
           type: Dynamic
         type: Values
       type: String
@@ -2376,6 +2376,243 @@ data:
       - children:
         - attributes:
             value: C
+          type: User
+        type: Values
+      type: String
+    DWT_INITIALIZATION:
+      attributes:
+        id: DWT_INITIALIZATION
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    DWT_HEADER:
+      attributes:
+        id: DWT_HEADER
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    DWT_SOURCE:
+      attributes:
+        id: DWT_SOURCE
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    DWT_DEFINITIONS:
+      attributes:
+        id: DWT_DEFINITIONS
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    DWT_ENABLE:
+      attributes:
+        id: DWT_ENABLE
+      children:
+      - children:
+        - attributes:
+            value: 'true'
+          type: User
+        type: Values
+      type: Boolean
+    PIN_37_DRVSTR:
+      attributes:
+        id: PIN_37_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '1'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_38_DRVSTR:
+      attributes:
+        id: PIN_38_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '1'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_39_DRVSTR:
+      attributes:
+        id: PIN_39_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '0'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_40_DRVSTR:
+      attributes:
+        id: PIN_40_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '0'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_36_DRVSTR:
+      attributes:
+        id: PIN_36_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '1'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_35_DRVSTR:
+      attributes:
+        id: PIN_35_DRVSTR
+      children:
+      - children:
+        - attributes:
+            value: '1'
+          type: User
+        type: Values
+      type: KeyValueSet
+    PIN_37_PULLEN:
+      attributes:
+        id: PIN_37_PULLEN
+      children:
+      - children:
+        - attributes:
+            value: ''
+          type: User
+        type: Values
+      type: String
+    PIN_44_DIR:
+      attributes:
+        id: PIN_44_DIR
+      children:
+      - children:
+        - attributes:
+            value: ''
+          type: User
+        type: Values
+      type: String
+    PORT_GROUP_0_PINCFG23:
+      attributes:
+        id: PORT_GROUP_0_PINCFG23
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '0x0'
+          type: Dynamic
+        type: Values
+      type: String
+    PORT_GROUP_0_PIN_23_USED:
+      attributes:
+        id: PORT_GROUP_0_PIN_23_USED
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: 'false'
+          type: Dynamic
+        type: Values
+      type: Boolean
+    PIN_44_PULLEN:
+      attributes:
+        id: PIN_44_PULLEN
+      children:
+      - children:
+        - attributes:
+            value: ''
+          type: User
+        type: Values
+      type: String
+    PIN_44_INEN:
+      attributes:
+        id: PIN_44_INEN
+      children:
+      - children:
+        - attributes:
+            value: ''
+          type: User
+        type: Values
+      type: String
+    PORT_GROUP_0_PINCFG15:
+      attributes:
+        id: PORT_GROUP_0_PINCFG15
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '0x6'
+          type: Dynamic
+        type: Values
+      type: String
+    PORT_GROUP_0_PIN_15_USED:
+      attributes:
+        id: PORT_GROUP_0_PIN_15_USED
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: 'true'
+          type: Dynamic
+        type: Values
+      type: Boolean
+    PIN_32_DIR:
+      attributes:
+        id: PIN_32_DIR
+      children:
+      - children:
+        - attributes:
+            value: ''
+          type: User
+        type: Values
+      type: String
+    PORT_GROUP_0_PAD_15:
+      attributes:
+        id: PORT_GROUP_0_PAD_15
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: PA15
+          type: Dynamic
+        type: Values
+      type: String
+    PIN_32_PERIPHERAL_FUNCTION:
+      attributes:
+        id: PIN_32_PERIPHERAL_FUNCTION
+      children:
+      - children:
+        - attributes:
+            value: SWITCH_AL
           type: User
         type: Values
       type: String

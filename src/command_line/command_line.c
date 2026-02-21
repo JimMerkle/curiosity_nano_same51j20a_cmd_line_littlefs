@@ -27,6 +27,7 @@
 #include "logger/logger.h"     // send output though "logger" module
 #include "version.h"
 #include "ymodem/ymodem.h"
+#include "ini_store_v2/ini_store_v2.h"
 
 // Typedefs
 typedef struct {
@@ -47,8 +48,11 @@ const COMMAND_ITEM cmd_table[] = {
     {"sx",        "send xmodem <file>",                                     cl_xmodem_send},
     {"rx",        "receive xmodem <file>",                                  cl_xmodem_receive},
     {"ymodem",    "ymodem <file> to send a file, else receive file",        cl_ymodem},
-	 {"version",   "display firmware version",                               cl_version},
+    {"version",   "display firmware version",                               cl_version},
     {"initest",   "test the ini_store key-value pair storage",              cl_ini_store_test},
+    {"iniset",    "iniset <file> <key> <value>",                            cl_iniset},
+    {"iniget",    "iniget <file> <key>",                                    cl_iniget},
+//  {"erasetimes","dump erasing timing collected",                          cl_dump_sector_erase_times},
     {"==========","==========================================",             NULL},
     FLASH_TEST_COMMANDS,
     {"==========","==========================================",             NULL},
@@ -60,6 +64,18 @@ const COMMAND_ITEM cmd_table[] = {
 char buffer[MAXSERIALBUF]; // holds command strings from user
 char * argv[MAXWORDS]; // pointers into buffer
 int argc; // number of words (command & arguments)
+
+// Enable command line history.  Comment out to remove history buffer and code.
+#define COMMAND_LINE_HISTORY 1
+
+#ifdef COMMAND_LINE_HISTORY
+#define MAX_COMMAND_HISTORY 20 /* remember last 20 commands */
+// Command history support
+static char history[MAX_COMMAND_HISTORY][MAXSERIALBUF];
+static int history_count = 0; // number of valid entries
+static int history_pos = 0;   // next slot to write
+static int history_view = -1; // -1 = not viewing, else index into history[]
+#endif
 
 // Implement a getchar function, needed for Command Line
 // If character available, return character, else return EOF
@@ -73,49 +89,177 @@ int __io_getchar(void) {
 } // __io_getchar())
 
 void cl_setup(void) {
-    // Turn on yellow text, print greeting, reset attributes
-    log_msg("\n" COLOR_YELLOW "Command Line parser, Version: %s, Date: %s" COLOR_RESET "\n",PROJECT_VERSION,__DATE__);
-    log_msg(COLOR_YELLOW "Enter \"help\" or \"?\" for list of commands" COLOR_RESET "\n");
-    log_msg(">"); // initial prompt
+  // Turn on yellow text, print greeting, reset attributes
+  // Print version with build date and time (no literal "Date:" label)
+  log_msg("\n" COLOR_YELLOW "Command Line parser, Version: %s, %s, %s" COLOR_RESET "\n", PROJECT_VERSION, __DATE__, __TIME__);
+  log_msg(COLOR_YELLOW "Enter \"help\" or \"?\" for list of commands" COLOR_RESET "\n");
+  log_msg(">"); // initial prompt
 }
 
 // Check for data available from USART interface.  If none present, just return.
 // If data available, process it (add it to character buffer if appropriate)
 void cl_loop(void)
 {
-    static int index = 0; // index into global buffer
-    int c;
+  static int index = 0; // index into global buffer
+  int c;
+  // Command line history editing state
+#ifdef COMMAND_LINE_HISTORY
+  static int cursor = 0; // position of cursor in buffer
+  static int editing = 0; // 0 = normal typing, 1 = editing mode
+#endif
 
-    // Spin, reading characters until EOF character is received (no data), buffer is full, or
-    // a <line feed> character is received.  Null terminate the global string, don't return the <LF>
-    while(1) {
-      c = __io_getchar();
-      switch(c) {
-          case EOF:
-              return; // non-blocking - return
-          case _CR:
-          case _LF:
-            buffer[index] = 0; // null terminate
-            if(index) {
-        		log_msg("\n"); // newline
-            	cl_process_buffer(); // process the null terminated buffer
-            }
-    		log_msg("\n>");
-            index = 0; // reset buffer index
-            return;
-          case _BS:
-            if(index<1) continue;
-            log_msg("\b \b"); // remove the previous character from the screen and buffer
-            index--;
-            break;
-          default:
-        	if(index<(MAXSERIALBUF - 1) && c >= ' ' && c <= '~') {
-                log_msg("%c",c); // write character to terminal
-                buffer[index] = (char) c;
-                index++;
-        	}
-      } // switch
-  } // while(1)
+  // Spin, reading characters from FIFO until EOF character is received (no data), buffer is full, or
+  // a <line feed> character is received.  Null terminate the global string, don't return the <LF>
+  while (1) {
+    c = __io_getchar();
+    switch (c) {
+      case EOF:
+        return; // non-blocking - return
+#ifdef COMMAND_LINE_HISTORY
+      // VT100/ANSI escape sequence handling for arrow keys
+      case 0x1B: { // ESC
+        int next1 = __io_getchar();
+        if (next1 == '[') {
+          int next2 = __io_getchar();
+          switch (next2) {
+            case 'A': // Up arrow
+              if (history_count > 0) {
+                if (history_view < 0)
+                  history_view = history_pos - 1;
+                else if (history_view > 0)
+                  history_view--;
+                else
+                  history_view = 0;
+                if (history_view < 0)
+                  history_view = history_count - 1;
+                // Copy history to buffer
+                strncpy(buffer, history[history_view], MAXSERIALBUF);
+                buffer[MAXSERIALBUF - 1] = 0;
+                index = strlen(buffer);
+                cursor = index;
+                // Redraw line
+                log_msg("\r>%-*s", MAXSERIALBUF - 1, buffer);
+                // Move cursor to end
+                log_msg("\r>%s", buffer);
+              }
+              continue;
+            case 'B': // Down arrow
+              if (history_count > 0 && history_view >= 0) {
+                history_view++;
+                if (history_view >= history_count) {
+                  // Clear buffer if past end
+                  buffer[0] = 0;
+                  index = 0;
+                  cursor = 0;
+                  history_view = -1;
+                } else {
+                  strncpy(buffer, history[history_view], MAXSERIALBUF);
+                  buffer[MAXSERIALBUF - 1] = 0;
+                  index = strlen(buffer);
+                  cursor = index;
+                }
+                // Redraw line
+                log_msg("\r>%-*s", MAXSERIALBUF - 1, buffer);
+                log_msg("\r>%s", buffer);
+              }
+              continue;
+            case 'C': // Right arrow
+              if (cursor < index) {
+                cursor++;
+                log_msg("\x1B[C");
+              }
+              editing = 1;
+              continue;
+            case 'D': // Left arrow
+              if (cursor > 0) {
+                cursor--;
+                log_msg("\x1B[D");
+              }
+              editing = 1;
+              continue;
+          }
+        }
+        continue;
+      }
+#endif // COMMAND_LINE_HISTORY
+      case _CR:
+      case _LF:
+        buffer[index] = 0; // null terminate
+        if (index) {
+          log_msg("\n"); // newline
+#ifdef COMMAND_LINE_HISTORY
+          // Save to history if not duplicate of last
+          if (index > 0 && (history_count == 0 || strcmp(buffer, history[(history_pos - 1 + MAX_COMMAND_HISTORY) % MAX_COMMAND_HISTORY]) != 0)) {
+            strncpy(history[history_pos], buffer, MAXSERIALBUF);
+            history[history_pos][MAXSERIALBUF - 1] = 0;
+            history_pos = (history_pos + 1) % MAX_COMMAND_HISTORY;
+            if (history_count < MAX_COMMAND_HISTORY)
+              history_count++;
+          }
+          history_view = -1;
+#endif
+          cl_process_buffer(); // process the null terminated buffer
+#ifdef COMMAND_LINE_HISTORY
+          cursor = 0;
+          editing = 0;
+#endif
+        }
+        log_msg("\n>");
+        index = 0;
+        return;
+      case _BS:
+      case 0x7F: // DEL
+        if (index < 1)
+          continue;
+#ifdef COMMAND_LINE_HISTORY
+        if (cursor > 0) {
+          // Remove character before cursor
+          memmove(&buffer[cursor - 1], &buffer[cursor], index - cursor + 1);
+          index--;
+          cursor--;
+          // Redraw line
+          log_msg("\r>%-*s", MAXSERIALBUF - 1, buffer);
+          // Move cursor to correct position
+          log_msg("\r>");
+          for (int i = 0; i < cursor; i++)
+            log_msg("\x1B[C");
+        }
+        continue;
+#else
+        log_msg("\b \b"); // remove the previous character from the screen and buffer
+        index--;
+        continue;
+#endif
+      default:
+        // If printable character, display and store it
+        if (index < (MAXSERIALBUF - 1) && c >= ' ' && c <= '~') {
+#ifdef COMMAND_LINE_HISTORY
+          if (!editing) {
+            // Normal typing: always append
+            buffer[index] = (char)c;
+            index++;
+            cursor = index;
+            log_msg("%c", c);
+          } else {
+            // Editing mode: insert at cursor
+            memmove(&buffer[cursor + 1], &buffer[cursor], index - cursor);
+            buffer[cursor] = (char)c;
+            index++;
+            cursor++;
+            // Redraw line
+            log_msg("\r>%-*s", MAXSERIALBUF - 1, buffer);
+            log_msg("\r>");
+            for (int i = 0; i < cursor; i++)
+              log_msg("\x1B[C");
+          }
+#else
+          log_msg("%c", c); // write character to terminal
+          buffer[index] = (char)c;
+          index++;
+#endif
+        }
+    } // switch
+  } // while (1)
   return;
 } // cl_loop()
 

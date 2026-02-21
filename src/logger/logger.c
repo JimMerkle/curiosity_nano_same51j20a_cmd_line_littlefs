@@ -39,8 +39,6 @@ int log_msg(const char *fmt, ...) {
     va_start(args, fmt);
     int msg_len = vsnprintf(print_buf, PRINTF_BUF_SIZE, fmt, args);
     va_end(args);
-    // If message doesn't fit, throw it out
-    //if (msg_len < 0 || msg_len > PRINTF_BUF_SIZE) return 0;
 
     if (msg_len < 0) return 0; // Error creating message
     // If message is too long, but we have it in the buffer, use it

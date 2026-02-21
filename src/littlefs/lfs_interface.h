@@ -34,12 +34,14 @@ int cl_remove(void);
 int cl_rmdir(void);
 int cl_make_file(void);
 int cl_make_file_4kb(void);
+int cl_make_file_1mb(void);
 int cl_rename(void);
 int cl_cat(void);
 int cl_copy(void);
 int cl_file_dump(void);
 int cl_readspeed(void);
 int cl_make_files_1mb(void);
+int cl_dump_sector_erase_times(void);
 
 // Records to add into command line interface (command_line.c):
 #define LITTLEFS_COMMANDS \
@@ -48,6 +50,7 @@ int cl_make_files_1mb(void);
 {"remove",     "Remove File/Directory (directory must be empty)",           cl_remove}, \
 {"makefile",   "Make a file <file name>",                                   cl_make_file}, \
 {"makefile4k", "Make a 4K byte file <file name>",                           cl_make_file_4kb}, \
+{"makefile1m", "Make a 1M byte file <file name>",                           cl_make_file_1mb}, \
 {"rename",     "Rename file/directory <current name> <new name>",           cl_rename}, \
 {"cat",        "Display text file (only printable text)",                   cl_cat}, \
 {"type",       "Display text file (only printable text)",                   cl_cat}, \

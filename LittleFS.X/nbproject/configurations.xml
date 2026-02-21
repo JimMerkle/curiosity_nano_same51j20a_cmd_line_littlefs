@@ -9,12 +9,18 @@
       </logicalFolder>
       <logicalFolder name="config" displayName="config" projectFiles="true">
         <logicalFolder name="default" displayName="default" projectFiles="true">
+          <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
+            <itemPath>../src/config/default/bsp/bsp.h</itemPath>
+          </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="clock" displayName="clock" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clock/plib_clock.h</itemPath>
             </logicalFolder>
             <logicalFolder name="cmcc" displayName="cmcc" projectFiles="true">
               <itemPath>../src/config/default/peripheral/cmcc/plib_cmcc.h</itemPath>
+            </logicalFolder>
+            <logicalFolder name="dwt" displayName="dwt" projectFiles="true">
+              <itemPath>../src/config/default/peripheral/dwt/plib_dwt.h</itemPath>
             </logicalFolder>
             <logicalFolder name="evsys" displayName="evsys" projectFiles="true">
               <itemPath>../src/config/default/peripheral/evsys/plib_evsys.h</itemPath>
@@ -57,6 +63,9 @@
       </logicalFolder>
       <logicalFolder name="f5" displayName="ini_store" projectFiles="true">
         <itemPath>../src/ini_store/ini_store.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f7" displayName="ini_store_v2" projectFiles="true">
+        <itemPath>../src/ini_store_v2/ini_store_v2.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="littlefs" projectFiles="true">
         <itemPath>../src/littlefs/lfs.h</itemPath>
@@ -214,6 +223,7 @@
           <itemPath>LittleFS_default/components/sercom1.yml</itemPath>
           <itemPath>LittleFS_default/components/sercom2.yml</itemPath>
           <itemPath>LittleFS_default/components/cmsis.yml</itemPath>
+          <itemPath>LittleFS_default/components/BSP_SAM_E51_Curiosity_Nano.yml</itemPath>
           <itemPath>LittleFS_default/components/core.yml</itemPath>
           <itemPath>LittleFS_default/components/evsys.yml</itemPath>
           <itemPath>LittleFS_default/components/sercom5.yml</itemPath>
@@ -247,12 +257,18 @@
       </logicalFolder>
       <logicalFolder name="config" displayName="config" projectFiles="true">
         <logicalFolder name="default" displayName="default" projectFiles="true">
+          <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
+            <itemPath>../src/config/default/bsp/bsp.c</itemPath>
+          </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="clock" displayName="clock" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clock/plib_clock.c</itemPath>
             </logicalFolder>
             <logicalFolder name="cmcc" displayName="cmcc" projectFiles="true">
               <itemPath>../src/config/default/peripheral/cmcc/plib_cmcc.c</itemPath>
+            </logicalFolder>
+            <logicalFolder name="dwt" displayName="dwt" projectFiles="true">
+              <itemPath>../src/config/default/peripheral/dwt/plib_dwt.c</itemPath>
             </logicalFolder>
             <logicalFolder name="evsys" displayName="evsys" projectFiles="true">
               <itemPath>../src/config/default/peripheral/evsys/plib_evsys.c</itemPath>
@@ -296,6 +312,9 @@
         <itemPath>../src/ini_store/ini_store.c</itemPath>
         <itemPath>../src/ini_store/ini_store_test.c</itemPath>
       </logicalFolder>
+      <logicalFolder name="f7" displayName="ini_store_v2" projectFiles="true">
+        <itemPath>../src/ini_store_v2/ini_store_v2.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="f3" displayName="littlefs" projectFiles="true">
         <itemPath>../src/littlefs/hexdump.c</itemPath>
         <itemPath>../src/littlefs/lfs.c</itemPath>
@@ -333,8 +352,8 @@
         <platform>3</platform>
       </toolsSet>
       <packs>
-        <pack name="CMSIS" vendor="ARM" version="5.4.0"/>
         <pack name="SAME51_DFP" vendor="Microchip" version="3.8.253"/>
+        <pack name="CMSIS" vendor="ARM" version="5.4.0"/>
       </packs>
       <ScriptingSettings>
       </ScriptingSettings>
@@ -363,6 +382,8 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/ini_store/ini_store.c" ex="true" overriding="false">
+      </item>
       <C32>
         <property key="additional-warnings" value="false"/>
         <property key="addresss-attribute-use" value="false"/>
@@ -633,8 +654,6 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-fffff"/>
         <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="C:/Users/jim/Documents/MPLABX_Projects/curiosity_nano_same51j20a_cmd_line_littlefs/LittleFS.X/debug/default/LittleFS_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"
