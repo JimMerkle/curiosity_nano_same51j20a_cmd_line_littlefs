@@ -38,21 +38,26 @@ SERCOM5 TX - PB16 (pin 39), SERCOM5 RX - PB17 (pin 40)
 ```
 ## Build Environment
 ```
- The build environment for Printf consists of the command_line repository cloned into a
+ The build environment for this project consists of this repository cloned into a
  folder structure as follows:
-    
-+-- command_line
-|   +-- command_line.X                        | mplab X project directory
+
++-- curiosity_nano_same51j20a_cmd_line_littlefs
+|   +-- LittleFS.X                            | MPLAB X project directory
 |   +-- src                                   | source directory
-|       +-- main.c                            | application
-|       +-- config                            | mcc generated configuration
-|       +-- packs                             | processor CMSIS and peripheral
-|       +-- logger.c                          | implements printf() functionality, writing to SERCOM TX FIFO
-|       +-- logger.h                          | int log_msg(const char *fmt, ...);
-|       +-- command_line.c                    | implements the interactive Command Line functionality
-|       +-- command_line.h                    | function prototypes
-|       +-- version.h                         | version string definition
-|   +-- README.md                             | This Readme.md file
+|       +-- main.c                            | application entry
+|       +-- command_line/                     | interactive command parser
+|       +-- config/default/                   | MCC/Harmony generated board/peripheral config
+|       |   +-- bsp/                          | board support package
+|       |   +-- peripheral/                   | clock/cmcc/dwt/evsys/nvic/nvmctrl/port/sercom/systick/tc
+|       |   +-- stdio/                        | monitor stdio support
+|       +-- ini_store/                        | ini store test module
+|       +-- ini_store_v2/                     | ini store v2 implementation
+|       +-- littlefs/                         | littlefs and flash interface
+|       +-- logger/                           | logging / printf support
+|       +-- xmodem/                           | xmodem transfer support
+|       +-- ymodem/                           | ymodem transfer support
+|       +-- packs/                            | ATSAME51J20A DFP + CMSIS headers
+|   +-- README.md                             | this README file
 |   +-- CuriosityNanoBoard.jpg                | Curiosity Nano picture
 ```
 

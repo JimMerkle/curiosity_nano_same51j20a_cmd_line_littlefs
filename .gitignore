@@ -1,6 +1,20 @@
-#.gitignore
-#Project build directories
+# MPLAB/XC32 generated build output
 LittleFS.X/build/
 LittleFS.X/dist/
+
+# MCC transient manifests
 LittleFS.X/mcc-manifest-autosave.yml
 LittleFS.X/mcc-manifest-generated-success.yml
+
+# MPLAB private/local user settings
+LittleFS.X/nbproject/private/
+LittleFS.X/nbproject/Makefile-local-*.mk
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
