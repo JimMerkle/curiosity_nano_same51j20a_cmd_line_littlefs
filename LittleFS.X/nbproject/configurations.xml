@@ -216,23 +216,20 @@
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="true">
-      <logicalFolder name="LittleFS_default"
-                     displayName="LittleFS_default"
+      <logicalFolder name="components"
+                     displayName="components"
                      projectFiles="true">
-        <logicalFolder name="components" displayName="components" projectFiles="true">
-          <itemPath>LittleFS_default/components/sercom1.yml</itemPath>
-          <itemPath>LittleFS_default/components/sercom2.yml</itemPath>
-          <itemPath>LittleFS_default/components/cmsis.yml</itemPath>
-          <itemPath>LittleFS_default/components/BSP_SAM_E51_Curiosity_Nano.yml</itemPath>
-          <itemPath>LittleFS_default/components/core.yml</itemPath>
-          <itemPath>LittleFS_default/components/evsys.yml</itemPath>
-          <itemPath>LittleFS_default/components/sercom5.yml</itemPath>
-          <itemPath>LittleFS_default/components/dfp.yml</itemPath>
-          <itemPath>LittleFS_default/components/nvmctrl.yml</itemPath>
-          <itemPath>LittleFS_default/components/tc0.yml</itemPath>
-        </logicalFolder>
-        <itemPath>LittleFS_default/mcc-config.mc4</itemPath>
+        <itemPath>components/sercom1.yml</itemPath>
+        <itemPath>components/sercom2.yml</itemPath>
+        <itemPath>components/cmsis.yml</itemPath>
+        <itemPath>components/core.yml</itemPath>
+        <itemPath>components/evsys.yml</itemPath>
+        <itemPath>components/sercom5.yml</itemPath>
+        <itemPath>components/dfp.yml</itemPath>
+        <itemPath>components/nvmctrl.yml</itemPath>
+        <itemPath>components/tc0.yml</itemPath>
       </logicalFolder>
+      <itemPath>mcc-config.mc4</itemPath>
       <itemPath>Makefile</itemPath>
       <itemPath>../src/config/default/pin_configurations.csv</itemPath>
     </logicalFolder>
@@ -383,6 +380,20 @@
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
       <item path="../src/ini_store/ini_store.c" ex="true" overriding="false">
+        <C32>
+        </C32>
+        <C32-AR>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-CO>
+        </C32-CO>
+        <C32-LD>
+        </C32-LD>
+        <C32CPP>
+        </C32CPP>
+        <C32Global>
+        </C32Global>
       </item>
       <C32>
         <property key="additional-warnings" value="false"/>
