@@ -34,8 +34,15 @@ MIC5353 LDO regulator controlled by the on-board debugger
 
 Serial/CDC Port - Prewired
 The only SERCOM connected to pins 39 and 40 is SERCOM5
-SERCOM5 TX - PB16 (pin 39), SERCOM5 RX - PB17 (pin 40)
 ```
+
+### SERCOM5 - Serial/CDC Port - Prewired for USB Serial Communication
+SERCOM5 is prewired for the USB CDC virtual COM port on this board:
+- SERCOM5 TX - PAD0 - PB16 (pin 39)
+- SERCOM5 RX - PAD1 - PB17 (pin 40)
+
+![SERCOM5 Configuration](SERCOM5_Configuration.jpg)
+![SERCOM5 Pins](SERCOM5_Pins.jpg)
 ## Build Environment
 ```
  The build environment for this project consists of this repository cloned into a

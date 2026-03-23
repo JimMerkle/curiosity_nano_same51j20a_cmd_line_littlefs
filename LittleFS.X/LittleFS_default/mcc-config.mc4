@@ -5,7 +5,6 @@ device: ATSAME51J20A
 deviceLibrary: {}
 groupModules: []
 modules:
-- BSP_SAM_E51_Curiosity_Nano
 - cmsis
 - core
 - dfp

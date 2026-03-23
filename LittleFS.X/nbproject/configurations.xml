@@ -216,9 +216,7 @@
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="true">
-      <logicalFolder name="components"
-                     displayName="components"
-                     projectFiles="true">
+      <logicalFolder name="components" displayName="components" projectFiles="true">
         <itemPath>components/sercom1.yml</itemPath>
         <itemPath>components/sercom2.yml</itemPath>
         <itemPath>components/cmsis.yml</itemPath>
@@ -228,6 +226,18 @@
         <itemPath>components/dfp.yml</itemPath>
         <itemPath>components/nvmctrl.yml</itemPath>
         <itemPath>components/tc0.yml</itemPath>
+      </logicalFolder>
+      <logicalFolder name="LittleFS_default"
+                     displayName="LittleFS_default"
+                     projectFiles="true">
+        <logicalFolder name="components" displayName="components" projectFiles="true">
+          <itemPath>LittleFS_default/components/dfp.yml</itemPath>
+          <itemPath>LittleFS_default/components/evsys.yml</itemPath>
+          <itemPath>LittleFS_default/components/nvmctrl.yml</itemPath>
+          <itemPath>LittleFS_default/components/cmsis.yml</itemPath>
+          <itemPath>LittleFS_default/components/core.yml</itemPath>
+        </logicalFolder>
+        <itemPath>LittleFS_default/mcc-config.mc4</itemPath>
       </logicalFolder>
       <itemPath>mcc-config.mc4</itemPath>
       <itemPath>Makefile</itemPath>
@@ -428,7 +438,7 @@
         <property key="oXC16gcc-sfr-warn" value="false"/>
         <property key="oXC16gcc-smar-io-lvl" value="1"/>
         <property key="oXC16gcc-smart-io-fmt" value=""/>
-        <property key="optimization-level" value="-O2"/>
+        <property key="optimization-level" value="-O1"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -496,7 +506,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value="4096"/>
+        <property key="heap-size" value="0"/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>
