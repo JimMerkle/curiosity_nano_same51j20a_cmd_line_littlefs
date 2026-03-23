@@ -43,6 +43,9 @@ SERCOM5 is prewired for the USB CDC virtual COM port on this board:
 
 ![SERCOM5 Configuration](SERCOM5_Configuration.jpg)
 ![SERCOM5 Pins](SERCOM5_Pins.jpg)
+## MCC Project Graph
+![System Diagram (MCC Project Graph)](System_Diagram.jpg)
+
 ## Build Environment
 ```
  The build environment for this project consists of this repository cloned into a
