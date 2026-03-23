@@ -9,9 +9,6 @@
       </logicalFolder>
       <logicalFolder name="config" displayName="config" projectFiles="true">
         <logicalFolder name="default" displayName="default" projectFiles="true">
-          <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
-            <itemPath>../src/config/default/bsp/bsp.h</itemPath>
-          </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="clock" displayName="clock" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clock/plib_clock.h</itemPath>
@@ -216,30 +213,22 @@
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="true">
-      <logicalFolder name="components" displayName="components" projectFiles="true">
-        <itemPath>components/sercom1.yml</itemPath>
-        <itemPath>components/sercom2.yml</itemPath>
-        <itemPath>components/cmsis.yml</itemPath>
-        <itemPath>components/core.yml</itemPath>
-        <itemPath>components/evsys.yml</itemPath>
-        <itemPath>components/sercom5.yml</itemPath>
-        <itemPath>components/dfp.yml</itemPath>
-        <itemPath>components/nvmctrl.yml</itemPath>
-        <itemPath>components/tc0.yml</itemPath>
-      </logicalFolder>
       <logicalFolder name="LittleFS_default"
                      displayName="LittleFS_default"
                      projectFiles="true">
         <logicalFolder name="components" displayName="components" projectFiles="true">
+          <itemPath>LittleFS_default/components/tc0.yml</itemPath>
+          <itemPath>LittleFS_default/components/sercom1.yml</itemPath>
+          <itemPath>LittleFS_default/components/sercom2.yml</itemPath>
           <itemPath>LittleFS_default/components/dfp.yml</itemPath>
           <itemPath>LittleFS_default/components/evsys.yml</itemPath>
           <itemPath>LittleFS_default/components/nvmctrl.yml</itemPath>
+          <itemPath>LittleFS_default/components/sercom5.yml</itemPath>
           <itemPath>LittleFS_default/components/cmsis.yml</itemPath>
           <itemPath>LittleFS_default/components/core.yml</itemPath>
         </logicalFolder>
         <itemPath>LittleFS_default/mcc-config.mc4</itemPath>
       </logicalFolder>
-      <itemPath>mcc-config.mc4</itemPath>
       <itemPath>Makefile</itemPath>
       <itemPath>../src/config/default/pin_configurations.csv</itemPath>
     </logicalFolder>
@@ -264,9 +253,6 @@
       </logicalFolder>
       <logicalFolder name="config" displayName="config" projectFiles="true">
         <logicalFolder name="default" displayName="default" projectFiles="true">
-          <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
-            <itemPath>../src/config/default/bsp/bsp.c</itemPath>
-          </logicalFolder>
           <logicalFolder name="peripheral" displayName="peripheral" projectFiles="true">
             <logicalFolder name="clock" displayName="clock" projectFiles="true">
               <itemPath>../src/config/default/peripheral/clock/plib_clock.c</itemPath>
@@ -506,7 +492,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value="0"/>
+        <property key="heap-size" value="4096"/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>

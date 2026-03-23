@@ -20,6 +20,9 @@
 /** This macro is used to suppress compiler messages about a parameter not being used in a function. */
 #define PARAMETER_NOT_USED(p) (void) ((p))
 
+/** Set to 1 to enable boot count file updates during lfs_init(). */
+#define BOOT_COUNT_ENABLED 0
+
 extern lfs_t lfs;
 extern const struct lfs_config lfs_cfg;
 

@@ -58,8 +58,8 @@
 /* SERCOM1 clk freq value for the baud calculation */
 #define SERCOM1_Frequency      (60000000UL)
 
-/* SERCOM1 SPI baud value for 20000000 Hz baud rate */
-#define SERCOM1_SPIM_BAUD_VALUE         (0UL)
+/* SERCOM1 SPI baud value for 10000000 Hz baud rate */
+#define SERCOM1_SPIM_BAUD_VALUE         (2UL)
 
 
 // *****************************************************************************

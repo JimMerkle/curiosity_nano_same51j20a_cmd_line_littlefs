@@ -262,6 +262,7 @@ const struct lfs_config lfs_cfg =
 
 uint32_t boot_count = 0;   // global accessible by other clients
 
+#if BOOT_COUNT_ENABLED
 int update_bootcount(void) {
     const char boot_count_name[] = "boot_count.txt";
     lfs_file_t file;
@@ -312,6 +313,7 @@ int update_bootcount(void) {
 
     return 0;
 }
+#endif
 
 // Initialize LittleFS: try mount up to 5 times with backoff,
 // then format once if mount fails. Return 0 on success, <0 on error.
@@ -328,7 +330,9 @@ int lfs_init(lfs_t *lfs, const struct lfs_config *cfg) {
         rc = lfs_mount(lfs, cfg);
         if (rc == 0) {
             //log_msg("lfs_init: mount succeeded on attempt %d\n", attempt);
+#if BOOT_COUNT_ENABLED
             update_bootcount();
+#endif
             return 0;
         }
         log_msg("lfs_init: mount attempt %d failed (rc=%d)\n", attempt, rc);
@@ -354,7 +358,9 @@ int lfs_init(lfs_t *lfs, const struct lfs_config *cfg) {
     }
 
     //log_msg("lfs_init: format + mount succeeded\n");
+#if BOOT_COUNT_ENABLED
     update_bootcount();
+#endif
     
     return 0;
 }
