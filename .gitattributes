@@ -1,0 +1,15 @@
+# Normalize text files by default
+* text=auto
+
+# Keep MCC and generated project metadata as LF to avoid Windows EOL churn
+*.yml text eol=lf
+*.mc4 text eol=lf
+*.mk text eol=lf
+Makefile text eol=lf
+
+# Binary assets
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.pdf binary
