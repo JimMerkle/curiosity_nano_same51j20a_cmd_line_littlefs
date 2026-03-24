@@ -804,7 +804,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x41'
+            value: '0x1'
           type: Dynamic
         type: Values
       type: String
@@ -815,7 +815,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x41'
+            value: '0x1'
           type: Dynamic
         type: Values
       type: String
@@ -826,7 +826,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x40'
+            value: '0x0'
           type: Dynamic
         type: Values
       type: String
@@ -837,7 +837,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0x41'
+            value: '0x1'
           type: Dynamic
         type: Values
       type: String
@@ -2447,7 +2447,7 @@ data:
       children:
       - children:
         - attributes:
-            value: '1'
+            value: '0'
           type: User
         type: Values
       type: KeyValueSet
@@ -2457,7 +2457,7 @@ data:
       children:
       - children:
         - attributes:
-            value: '1'
+            value: '0'
           type: User
         type: Values
       type: KeyValueSet
@@ -2487,7 +2487,7 @@ data:
       children:
       - children:
         - attributes:
-            value: '1'
+            value: '0'
           type: User
         type: Values
       type: KeyValueSet
@@ -2497,7 +2497,7 @@ data:
       children:
       - children:
         - attributes:
-            value: '1'
+            value: '0'
           type: User
         type: Values
       type: KeyValueSet

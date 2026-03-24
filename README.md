@@ -43,6 +43,20 @@ SERCOM5 is prewired for the USB CDC virtual COM port on this board:
 
 ![SERCOM5 Configuration](SERCOM5_Configuration.jpg)
 ![SERCOM5 Pins](SERCOM5_Pins.jpg)
+
+### SERCOM1 - SPI interface to external Winbond W25Q128FV (or similar) flash chip
+- SERCOM1 - PAD0 - PA16 (pin 33) - SPI MOSI
+- SERCOM1 - PAD1 - PA17 (pin 36) - SPI SCK
+- nCS_PA18       - PA18 (pin 37) - SPI Chip Select - active low
+- SERCOM1 - PAD3 - PA19 (pin 38) - SPI MISO
+
+![SERCOM1 Configuration](SERCOM1_Configuration.jpg)
+![SERCOM1 Pins](SERCOM1_Pins.jpg)
+
+### SERCOM2 - USART interface for debugging XMODEM/YMODEM (Optional)
+- SERCOM2 TX - PAD0 - PA12 (pin 29)
+- SERCOM2 RX - PAD1 - PA13 (pin 30)
+ 
 ## MCC Project Graph
 ![System Diagram (MCC Project Graph)](System_Diagram.jpg)
 
@@ -92,5 +106,11 @@ https://developerhelp.microchip.com/xwiki/bin/view/software-tools/harmony/archiv
 ### YouTube Videos
 ```
 https://www.youtube.com/watch?v=wZlUVmyrH54
+
+```
+
+### Version Log
+```
+0.9.3 Add cls command.  Add text_in_box()
 
 ```

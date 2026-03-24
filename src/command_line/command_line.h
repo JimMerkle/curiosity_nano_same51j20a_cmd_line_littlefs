@@ -61,6 +61,7 @@ void cl_process_buffer(void);
 
 // command line functions
 int cl_help(void);
+int cl_cls(void);
 int cl_add(void);
 int cl_id(void);
 int cl_reset(void);
@@ -73,5 +74,6 @@ int cl_xmodem_receive(void);
 int cl_xmodem_send(void);
 
 int cl_ini_store_test(void); // ini_store_test.c
+void text_in_box(const char *text, const char *color);
 
 #endif // _command_line_h_
