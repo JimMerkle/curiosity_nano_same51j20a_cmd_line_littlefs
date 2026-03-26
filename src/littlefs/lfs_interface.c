@@ -966,7 +966,7 @@ int lfs_gets(lfs_file_t *file, char *buffer, size_t buffsize) {
 #endif
 
 
-
+#if 0
 // Write 1MByte of file data to 4K byte files.  Record time.  Display count after each file is written.
 // Requires 1 argument, the base part of file names
 // Record the time to create and store the files
@@ -1023,6 +1023,7 @@ int cl_make_files_1mb(void)
     log_msg("Created 256 files in %lu ms\n",stop_ms-start_ms);
     return rc;
 } // cl_make_files1_1mb()
+#endif
 
 // Assuming a 120MHz counter is used, convert 120MHz count into a us string with decimal point
 // Example: Convert 6552 counts to 54.6us

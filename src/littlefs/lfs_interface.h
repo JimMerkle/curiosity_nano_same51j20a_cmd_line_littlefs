@@ -59,7 +59,8 @@ int cl_dump_sector_erase_times(void);
 {"type",       "Display text file (only printable text)",                   cl_cat}, \
 {"copy",       "Copy file <source file name> <destination file name>",      cl_copy}, \
 {"filedump",   "Display <file> data as Hexadecimal",                        cl_file_dump}, \
-{"readspeed",  "Display time to open, read, and close <file>",              cl_readspeed}, \
-{"1mbfiles",   "Create 256 - 4KByte files (1MByte) with <basename>",        cl_make_files_1mb} \
+{"readspeed",  "Display time to open, read, and close <file>",              cl_readspeed} \
+
+//{"1mbfiles",   "Create 256 - 4KByte files (1MByte) with <basename>",        cl_make_files_1mb} \
 
 #endif // _lfs_interface_h_

@@ -111,6 +111,7 @@ https://www.youtube.com/watch?v=wZlUVmyrH54
 
 ### Version Log
 ```
-0.9.3 Add cls command.  Add text_in_box()
+0.10.0  Add color support to logger
+0.9.3   Add cls command.  Add text_in_box()
 
 ```
