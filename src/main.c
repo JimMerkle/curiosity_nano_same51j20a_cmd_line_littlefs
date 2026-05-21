@@ -78,7 +78,7 @@ int main ( void )
    
    // Send string out SERCOM2 - negligible impact if connected or not
    const char hello[]={"Hello from SERCOM2\n"}; // Includes terminating null
-   SERCOM2_USART_Write(hello,sizeof(hello)-1);
+   SERCOM2_USART_Write((uint8_t*)hello,sizeof(hello)-1);
     
    // Mount LittleFS 
    lfs_init(&lfs, &lfs_cfg);
