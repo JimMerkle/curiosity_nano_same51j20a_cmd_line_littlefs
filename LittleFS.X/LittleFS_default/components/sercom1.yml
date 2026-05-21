@@ -1,6 +1,6 @@
 configVersion: 1.0.0
 componentName: sercom1
-coreVersion: 5.8.3
+coreVersion: 5.8.4
 device: ATSAME51J20A
 library: []
 dependency:
@@ -211,7 +211,7 @@ data:
         type: Attributes
       - children:
         - attributes:
-            value: '10000000'
+            value: '15000000'
           type: User
         type: Values
       type: Integer
@@ -222,7 +222,7 @@ data:
       - children:
         - attributes:
             id: sercom1
-            value: '2'
+            value: '1'
           type: Dynamic
         type: Values
       type: Integer

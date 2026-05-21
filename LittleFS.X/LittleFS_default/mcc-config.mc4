@@ -1,6 +1,6 @@
 configVersion: 1.0.0
-coreVersion: 5.8.3
-spaHostVersion: 1.2.0
+coreVersion: 5.8.4
+spaHostVersion: 1.2.1
 device: ATSAME51J20A
 deviceLibrary: {}
 groupModules: []
@@ -18,7 +18,7 @@ generatedFileHashHistoryMap:
 - file: ..\src\config\default\ATSAME51J20A.ld
   hash: cf9e43606b6883c68912608a9a10db9fe47b5ee9e5c3bccf5cfc26bb7676f6d6
 - file: ..\src\config\default\definitions.h
-  hash: f170515b987e333fada58361fac0caef0fac3e36f5c7750e5086741ffc4b6541
+  hash: c3ae064a496bb18e560a6aedaf62b196530fc7d3a85d3a79e2fa2a8cd9c9627b
 - file: ..\src\config\default\device.h
   hash: 238ff5a236ff86e1ff76d0fec3b8ea4472f5f787803514cf9116e2e0c2d5a7e2
 - file: ..\src\config\default\device_cache.h
@@ -64,7 +64,7 @@ generatedFileHashHistoryMap:
 - file: ..\src\config\default\peripheral\port\plib_port.h
   hash: 3f74ccffeb3b24e2565e2e1bba02db4a96daf8360bfd3ca33923e3144b2b91f0
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom1_spi_master.c
-  hash: 09ba80abfbc65d633d4c93e2633a0aec1a2dfbb6f53dc550ce4c06bb139e0977
+  hash: 6d9b6b31854004ced77f139b8fc81627c92adb5d4622c20b6188eaf72173af4f
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom1_spi_master.h
   hash: 94858ce75946aab8706a2b90a08d79a392fffb1a766510e906874e644e221886
 - file: ..\src\config\default\peripheral\sercom\spi_master\plib_sercom_spi_master_common.h

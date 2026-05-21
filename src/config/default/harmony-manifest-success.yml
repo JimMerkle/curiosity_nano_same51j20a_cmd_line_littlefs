@@ -4,13 +4,13 @@
 
 
 project: LittleFS
-creation_date: 2026-03-24T10:26:07.254-05:00[America/Chicago]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
+creation_date: 2026-05-21T09:31:12.085-05:00[America/Chicago]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
 operating_system: Windows 11
 mcc_mode: IDE            # [IDE|Standalone|Headless]
-mcc_version: v5.6.3
-mcc_core_version: v5.8.3
+mcc_version: v5.6.4
+mcc_core_version: v5.8.4
 mplabx_version: v6.25        # if MPLAB X plugin only
-harmony_version: v5.6.3
+harmony_version: v5.6.4
 compiler: XC32 4.60
 
 modules:

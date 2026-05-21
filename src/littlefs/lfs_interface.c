@@ -229,8 +229,8 @@ lfs_t lfs;
 
 #define READ_SIZE               1   // Minimum size of a block read. All read operations will be a multiple of this value.
 #define PROGRAM_SIZE            1   // Minimum size of a block program. All program operations will be a multiple of this value.
-#define CACHE_SIZE              32  // Used for both read and program buffers
-#define LOOKAHEAD_CACHE_SIZE    32
+#define CACHE_SIZE              256 // Used for both read and program buffers
+#define LOOKAHEAD_CACHE_SIZE    256
 
 const struct lfs_config lfs_cfg =
 {
@@ -250,7 +250,7 @@ const struct lfs_config lfs_cfg =
    //.read_buffer = &read_buffer,            // read_buffer
    //.prog_buffer = &program_buffer,         // prog_buffer
 
-   .read_buffer = NULL,                // let lfs allocate per file
+   .read_buffer = NULL,                // allow lfs allocate per file
    .prog_buffer = NULL,
 
    .lookahead_buffer = NULL,           // lookahead_buffer

@@ -74,7 +74,11 @@ int main ( void )
 
    cl_setup();
 
-   SYSTICK_DelayMs(50);
+   SYSTICK_DelayMs(30);
+   
+   // Send string out SERCOM2 - negligible impact if connected or not
+   const char hello[]={"Hello from SERCOM2\n"}; // Includes terminating null
+   SERCOM2_USART_Write(hello,sizeof(hello)-1);
     
    // Mount LittleFS 
    lfs_init(&lfs, &lfs_cfg);
