@@ -29,13 +29,32 @@
 #include "command_line/command_line.h"
 #include "littlefs/lfs_interface.h"
 
+// *****************************************************************************
+// *****************************************************************************
+// Module: LED Heartbeat
+// Flash an LED at a predetermined rate within a polled loop
+//   This function is expected to be called at a 1KHz rate - or faster
+//   Use a timer to determine when to toggle
+// *****************************************************************************
+// *****************************************************************************
+#define HEARTBEAT_TOGGLE_TIME_MS 500
+void led_heartbeat(void)
+{
+   static uint32_t previous_ticks = 0;
+   // Calculate delta time since last call
+   uint32_t current_ticks = SYSTICK_GetTickCounter();
+   // If delta is greater / or equal to HEARTBEAT_TOGGLE_TIME_MS, toggle LED
+   if((current_ticks - previous_ticks) >= HEARTBEAT_TOGGLE_TIME_MS) {
+      LED_PA14_AL_Toggle();
+      previous_ticks = current_ticks;
+   }
+}
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Main Entry Point
 // *****************************************************************************
 // *****************************************************************************
-
 int main ( void )
 {
    /* Initialize all modules */
@@ -65,8 +84,9 @@ int main ( void )
       /* Maintain state machines of all polled MPLAB Harmony modules. */
       //SYS_Tasks ( ); // Nothing here at this time
       cl_loop();
-      LED_PA14_AL_Toggle();
-      SYSTICK_DelayMs(50);
+      //LED_PA14_AL_Toggle();
+      //SYSTICK_DelayMs(50);
+      led_heartbeat(); // better way to manage a heartbeat
    }
 
    /* Execution should not come here during normal operation */

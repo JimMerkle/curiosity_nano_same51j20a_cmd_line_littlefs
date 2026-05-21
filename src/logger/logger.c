@@ -19,7 +19,7 @@ All log messages get an automatic "Line Feed"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "logger.h"
+#include "logger/logger.h"
 
 // SAMD / SAME definitions
 #include "definitions.h"                // All SAM peripherals
@@ -144,7 +144,7 @@ int cl_logger_test(void) {
 	log_msg("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\n");	// 10
     
     uint32_t stop_us = TC0_Timer32bitCounterGet(); // read us hardware timer - 1MHz rate (1us increments)
-    log_msg("\n10 - 100+ character messages queued in %u us\n",(stop_us - start_us);
+    log_msg("\n10 - 100+ character messages queued in %u us\n",(stop_us - start_us));
     
     /* Additional automated checks: exercise priorities and overflow handling */
     log_info("AUTO-TEST: INFO message, value=%d", 123);

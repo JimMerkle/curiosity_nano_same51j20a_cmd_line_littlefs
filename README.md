@@ -57,6 +57,16 @@ SERCOM5 is prewired for the USB CDC virtual COM port on this board:
 - SERCOM2 TX - PAD0 - PA12 (pin 29)
 - SERCOM2 RX - PAD1 - PA13 (pin 30)
  
+## Timers
+
+### TC0 — 32-bit microsecond counter
+
+`TC0` is configured as a 32-bit timer running at 1 MHz (increments every 1 µs). The current 32-bit counter value can be read from firmware using `TC0_Timer32bitCounterGet()`.
+
+### SYSTICK — millisecond tick counter
+
+The system SYSTICK provides a millisecond tick (increments every 1 ms). The current 32-bit millisecond tick count is available via `SYSTICK_GetTickCounter()`.
+
 ## MCC Project Graph
 ![System Diagram (MCC Project Graph)](System_Diagram.jpg)
 
