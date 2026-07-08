@@ -1,45 +1,40 @@
 @echo off
-rem Build and flash helper for Curiosity Nano (SAM E51)
-rem Usage: double-click or run from cmd. Requires 'make' in PATH and 'pyocd' for flashing.
-
 setlocal
-set "ROOT=%~dp0"
+rem build.bat - clean rebuild of the MPLAB X project.
+rem Artifacts land in: LittleFS.X\dist\default\production
+set "T0=%TIME%"
+set "RC=0"
+set "XPROJ=LittleFS.X"
 
-rem Prefer MPLAB X bundled GNU tools if present
-set "MPLAB_GNU=C:\Program Files\Microchip\MPLABX\v6.25\gnuBins\GnuWin32\bin"
-if exist "%MPLAB_GNU%\make.exe" (
-    echo Using MPLAB X GNU tools from: %MPLAB_GNU%
-    set "PATH=%MPLAB_GNU%;%PATH%"
-) else (
-    echo MPLAB X GNU tools not found at %MPLAB_GNU% (falling back to PATH)
+rem Auto-detect MPLAB X (prefer v6.30, else v6.25).
+set "MPLABX="
+if exist "C:\Program Files\Microchip\MPLABX\v6.30\mplab_platform\bin\prjMakefilesGenerator.bat" set "MPLABX=C:\Program Files\Microchip\MPLABX\v6.30"
+if not defined MPLABX if exist "C:\Program Files\Microchip\MPLABX\v6.25\mplab_platform\bin\prjMakefilesGenerator.bat" set "MPLABX=C:\Program Files\Microchip\MPLABX\v6.25"
+if not defined MPLABX (
+    echo MPLAB X v6.30 or v6.25 not found. Update build.bat.
+    set "RC=1"
+    goto :done
 )
 
-echo Building project (LittleFS.X)...
-echo Updating timestamp on command_line.c to force rebuild of that unit
-"C:\Program Files\Microchip\MPLABX\v6.25\gnuBins\GnuWin32\bin\touch.exe" "%ROOT%src\command_line\command_line.c"
-make -C "%ROOT%LittleFS.X" build
-if errorlevel 1 (
-    echo.
-    echo Build failed. Check the output above for errors.
-    exit /b 1
-)
+set "PATH=%MPLABX%\gnuBins\GnuWin32\bin;%PATH%"
+pushd "%~dp0%XPROJ%"
+if exist build rmdir /s /q build
+if exist debug rmdir /s /q debug
+if exist dist  rmdir /s /q dist
+call "%MPLABX%\mplab_platform\bin\prjMakefilesGenerator.bat" -v .
+"%MPLABX%\gnuBins\GnuWin32\bin\make.exe" -f nbproject/Makefile-default.mk SUBPROJECTS= .build-conf
+set "RC=%errorlevel%"
+popd
 
-echo Searching for build artifacts (.elf and .hex)...
-set "ELF="
-set "HEX="
-for /R "%ROOT%LittleFS.X" %%f in (*.elf) do if not defined ELF set "ELF=%%f"
-for /R "%ROOT%LittleFS.X" %%f in (*.hex) do if not defined HEX set "HEX=%%f"
+if "%RC%"=="0" (echo Build completed successfully.) else (echo BUILD FAILED with exit code %RC%.)
 
-if not defined ELF if defined HEX set "ELF=%HEX%"
-
-if not defined ELF (
-    echo No .elf or .hex artifact found under LittleFS.X. Look under build/ or dist/.
-    exit /b 2
-)
-
-echo Build complete.
-echo ELF: %ELF%
-if defined HEX echo HEX: %HEX%
-echo To program the target, open MPLAB IPE and load the above ELF or HEX file.
-endlocal
-exit /b 0
+:done
+set "T1=%TIME%"
+set "S=%T0: =0%"
+set /a "s0=(1%S:~0,2%-100)*3600+(1%S:~3,2%-100)*60+(1%S:~6,2%-100)"
+set "S=%T1: =0%"
+set /a "s1=(1%S:~0,2%-100)*3600+(1%S:~3,2%-100)*60+(1%S:~6,2%-100)"
+set /a "elapsed=s1-s0"
+if %elapsed% lss 0 set /a "elapsed+=86400"
+echo build.bat elapsed: %elapsed% s
+endlocal & exit /b %RC%
