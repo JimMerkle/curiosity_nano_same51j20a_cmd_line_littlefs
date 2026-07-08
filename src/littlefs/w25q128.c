@@ -122,8 +122,8 @@ int W25_PageProgram(uint32_t address, uint8_t *buf, uint32_t count)
 {
   int rc;
   //log_msg("+%s(Addr 0x%06X, Len 0x%04X)\r\n",__func__,address,count);
-  W25_WriteEnable(); // Make sure we can write...
   while(count) {
+    W25_WriteEnable(); // WEL auto-clears after each completed Page Program, so re-enable per page
     uint8_t cmdaddr[4] = {W25_CMD_PAGE_PROGRAM,address>>16,address>>8,address};
     uint32_t space_left_in_page = 0x100 - (address & 0xFF);
     uint32_t count_this_pass = count <= space_left_in_page? count:space_left_in_page;
